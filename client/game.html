@@ -134,7 +134,7 @@
             tile.html(data.l);
             tile.css('color', data.c);
         });
-        socket.on('nextTurn', function(data){
+        socket.on('changeTurn', function(data){
             $('#turn').css('background-color', background);
             $('.aplayer').html(g.playersArray[data.aturn].name);
             $('.aplayer').css('color', g.playersArray[data.aturn].c);
@@ -143,7 +143,7 @@
             
             // g.dotsArray.length = dotsMax-4;
 
-            if(data.nturn==pindex) play("yourturn");
+            if(data.aturn==pindex) play("yourturn");
         });
         socket.on('endGame', function(){
             $("#board > .flexbox").children(".tile").empty();

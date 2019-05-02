@@ -189,7 +189,7 @@ function startGame(gameid){
 
             for(var i in g.playersArray){
                 let socket = socketsList[g.playersArray[i].id];
-                socket.emit('nextTurn',{
+                socket.emit('changeTurn',{
                     aturn: g.turn,
                     nturn: nturn
                 });
