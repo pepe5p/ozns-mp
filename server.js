@@ -21,6 +21,8 @@ const colors = [red, blue, green, yellow, pink];
 const dcolors = [dred, dblue, dgreen, dyellow, dpink];
 //
 
+var PORT = process.env.PORT || 2000;
+
 const express = require('express');
 const app = express();
 var serv = require('http').Server(app);
@@ -31,7 +33,7 @@ app.get('/', function(req, res){
 
 app.use('/client', express.static(__dirname + '/client'));
 
-serv.listen(2000);
+serv.listen(PORT);
 console.log("server started");
 
 var gamesArray = [];
