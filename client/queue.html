@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="Shortcut icon" href="img/oznsgame.jpg" />
+    <title>OZNS GAME | POCZEKALNIA</title>
+    <meta name="author" content="Piotr Karaś" />
+    <meta http-equiv="X-Ua-Compatible" content="IE=edge,chrome=1" />
+    <link rel="stylesheet" href="style/style.css" type="text/css" />
+</head>
+<body>
+    <div class="container bborder">
+        <div id="queue" class="xcbox ycbox box300 sborder">
+            <div class="tablerow">
+                <button class="blur" type="button" onclick="window.location='homepage.html'">WYJDŹ</button>
+            </div>
+            <div class="tablerow">Czekasz teraz na pozostałych graczy. Rozgrywka rozpocznie się gdy ostatni gracz dołączy.</div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="socketiopack.js"></script>
+    <script>
+        var gameid = getCookie("gameid");
+        if (gameid == null) window.location = "homepage.html";
+
+        socket.emit('showGames',{
+            all: false,
+            index: gameid
+        });
+        var pn;
+        var playersLen;
+        socket.on('getGames', function(data){
+            let game = data.msg;
+            pn = game.pn;
+            let players = game.playersArray;
+            playersLen = players.length;
+            if(playersLen == pn) window.location = "game.html";
+            let rules = "";
+            let playersText = "<span class='players'>";
+            for(j=0; j<playersLen; j++){
+                playersText += "<br>GRACZ "+(j+1)+": "+players[j].name;
+            }
+            let board = game.board;
+            let onz = game.onz;
+            if(onz==true) rules+=" onz";
+            let color = game.color;
+            if(color==true) rules+=" color";
+            let combo = game.combo;
+            if(combo==true) rules+=" combo";
+            let cards = game.cards;
+            if(cards==true) rules+=" cards";
+
+            $('#queue').append('<div class="tablerow">GRACZE: <span class="pn">'
+            +playersLen+'</span>/'+pn
+            +'<br>PLANSZA: '+board+'/'+board
+            +playersText+"</span>"
+            +'<br>ZASADY:'+rules+"</div>");
+        });
+        socket.on('newPlayerInYourGame', function(data){
+            if(data.gameid == gameid){
+                playersLen++;
+                if(playersLen == pn) window.location = "game.html";
+                $('.pn').html(playersLen);
+                $('.players').append("<br>GRACZ "+playersLen+": "+data.newPlayer);
+            }
+        });
+    </script>
+</body>
+</html>

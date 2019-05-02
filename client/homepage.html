@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="Shortcut icon" href="img/oznsgame.jpg" />
+    <title>OZNS GAME</title>
+    <meta name="author" content="Piotr Karaś" />
+    <meta http-equiv="X-Ua-Compatible" content="IE=edge,chrome=1" />
+    <link rel="stylesheet" href="style/style.css" type="text/css" />
+</head>
+<body>
+    <div class="perspective">
+        <div class="rotatebox">
+            <div class="mid container bborder">
+                <div class="xcbox titlebox">
+                    <div class="title">
+                        <span class="blur">official</span>
+                        <h1>OZNS<br>GAME</h1>
+                    </div>
+                </div>
+                <div class="xcbox" style="top: 60%;">
+                    <a class="sblur" href="javascript:(0)" onclick="window.location = 'findgames.html'">WYSZUKAJ GRĘ</a>
+                </div>
+                <div class="xcbox" style="top: 70%;">
+                    <a class="sblur" href="javascript:(0)" onclick="rotate('-50vw','-50vw',-90)">STWÓRZ GRĘ</a>
+                </div>
+                <div class="xcbox" style="top: 80%;">
+                    <a class="blur" href="javascript:(0)" onclick="rotate('50vw','-50vw',90)">ZASADY</a>
+                </div>
+            </div>
+            <div class="left container bborder">
+                <div class="xcbox box300 sborder nonvb scrollable">
+                    <div class="tablerow">
+                        <button class="blur" onclick="rotate(0,0,0)" type="button">WRÓC-></button>
+                    </div>
+                    <div class="tablerow">
+                        1. Liczba graczy, zasady gry, szerokość i wysokość planszy
+                        są ustalane przez osobę tworzącą grę.
+                    </div>
+                    <div class="tablerow">
+                        2. Gracze wpisują jedną literę wybraną spośród 
+                        "O", "Z", "N" lub "S" do planszy naprzemiennie w czasie swojej tury.
+                    </div>
+                    <div class="tablerow">
+                        3. Nie można stawiać liter w polach, które stykają się ścianą z
+                        polami zawierającymi taką samą literę, czyli poprostu pole obok.
+                        Wyjątkiem jest ułożenie kątowe lub combo. (Następne punkty.)
+                    </div>
+                    <div class="tablerow">
+                        4. Ułożenie conajmniej trzech tych samych liter obok jednego pola 
+                        powoduje, że można w tym polu stawiać tą literę.
+                    </div>
+                    <div class="tablerow">
+                        5. Skreślenie w kółko wszystkich 4 liter: O,Z,N,S (kolejność 
+                        obojętna) wokół jednego pola daje graczowi kolejny ruch 
+                        (skreślającemu) a także możliwość stawiania w tym polu wszystkich 4 
+                        liter. (wszystkim graczom)
+                    </div>
+                    <div class="tablerow">
+                        6. Punkty są przyznawane kolejno za skreślenie w rzędzie 
+                        (obojętnie czy na ukos lub na odwrót, wszystko się liczy):<br>
+                        - ONZ (1pkt)<br>
+                        - 4 litery koloru gracza (1pkt)<br>
+                        - OZNS (1pkt + 1pkt za każdą literę koloru gracza)<br>
+                    </div>
+                    <div class="tablerow">
+                        7. Koniec planszy następuje gdy gracz skreśli OZNS lub zapełnione 
+                        zostaną wszystkie pola na planszy. W tych wypadkach nową planszę
+                        rozpoczyna gracz następny w kolejce po graczu rozpoczynającym
+                        tą planszę.
+                    </div>
+                </div>
+            </div>
+            <div class="right container bborder">
+                <form class="xcbox ycbox box300 sborder">
+                    <div class="tablerow">
+                        <button class="blur" type="button" onclick="rotate(0,0,0)"><-WRÓC</button>
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">LICZBA GRACZY</div>
+                        <input name="players" class="blur" type="number" value="2">
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">ROZMIAR PLANSZY</div>
+                        <input name="board" class="dblur" type="number" value="5" disabled>
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">TWÓJ NICK</div>
+                    </div>
+                    <div class="tablerow">
+                        <input name="nick" class="blur" type="text" value="player1">
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">ONZ</div>
+                        <input name="onz" type="checkbox" checked>
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">KOLOR</div>
+                        <input name="color" type="checkbox" checked>
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">COMBO</div>
+                        <input name="combo" type="checkbox" checked>
+                    </div>
+                    <div class="tablerow">
+                        <div class="rowname">KARTY</div>
+                        <input name="cards" type="checkbox" disabled>
+                    </div>
+                    <div class="tablerow">
+                        <button class="blur" type="reset">PRZYWRÓĆ DOMYŚLNE</button>
+                    </div>
+                    <div class="tablerow">
+                        <button class="sblur" type="button" onclick="submitForm()">STWÓRZ ROZGRYWKĘ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="socketiopack.js"></script>
+    <script>
+        function rotate(x, z, angle){ 
+            $('.rotatebox').css('transform','translate3d('+x+',0,'+z+') rotateY('+angle+'deg)'); 
+        }
+
+        function submitForm(){
+            let nick = $('input[name="nick"]').val();
+            let players = $('input[name="players"]').val();
+            let board = $('input[name="board"]').val();
+            if(nick!="" && players>=2 && board >=4 && board<=10){
+                if($('input[name="onz"]').prop("checked")) onz = true;
+                else onz = false;
+                if($('input[name="color"]').prop("checked")) color = true;
+                else color = false;
+                if($('input[name="combo"]').prop("checked")) combo = true;
+                else combo = false;
+                if($('input[name="cards"]').prop("checked")) cards = true;
+                else cards = false;
+                socket.emit('createGame',{
+                    p: players,
+                    board: board,
+                    player1: nick,
+                    onz: onz,
+                    color: color,
+                    combo: combo,
+                    cards: cards
+                })
+            }
+        }
+        socket.on('getYoursGameId',function(data){
+            document.cookie = "gameid="+data.gameindex;
+            setTimeout(function(){window.location = "queue.html"},100)
+        })
+
+    </script>
+</body>
+</html>

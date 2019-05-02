@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="Shortcut icon" href="img/oznsgame.jpg" />
+    <title>OZNS GAME | GRY</title>
+    <meta name="author" content="Piotr Karaś" />
+    <meta http-equiv="X-Ua-Compatible" content="IE=edge,chrome=1" />
+    <link rel="stylesheet" href="style/style.css" type="text/css" />
+</head>
+<body>
+    <div class="makegrey container bborder">
+        <div id="games" class="xcbox box300 sborder nonvb scrollable">
+            <div class="tablerow">
+                <button class="blur" type="button" onclick="window.location='homepage.html'">WYJDŹ</button>
+            </div>
+        </div>
+    </div>
+    <div class="put_nick xcbox ycbox box300 sborder">
+        <div class="tablerow">
+            <input name="nick" class="blur" type="text">
+            <input name="gameid" type="hidden">
+        </div>
+        <div class="tablerow">
+            <button class="sblur" type="button" onclick="joinGame()">DOŁACZ</button>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+	<script src="socketiopack.js"></script>
+    <script>
+        socket.emit('showGames',{
+            all: true
+        });
+        socket.on('getGames', function(data){
+            let gamesArray = data.msg;
+            let games = $('#games');
+            for(i=0; i<gamesArray.length; i++){
+                let rules = "";
+                let playersText = "";
+                let btn;
+                let g = gamesArray[i];
+                let players = g.playersArray;
+                let pn = g.pn;
+                for(j=0; j<players.length; j++){
+                    //WYPISUJE Z TABELI GIER Z TABELI GRACZY NAZWĘ ODPOWIEDNIEGO GRACZA XD
+                    playersText += "<br>GRACZ "+(j+1)+": "+players[j].name;
+                }
+                let board = g.board;
+                let onz = g.onz;
+                if(onz==true) rules+=" onz";
+                let color = g.color;
+                if(color==true) rules+=" color";
+                let combo = g.combo;
+                if(combo==true) rules+=" combo";
+                let cards = g.cards;
+                if(cards==true) rules+=" cards";
+
+                if(players.length==pn) btn = "";
+                else btn = '<button class="blur" type="button" onclick="putNick('+players.length+','+i+')">DOŁACZ</button></div>';
+
+                games.append('<div class="tablerow">GRACZE: '+players.length+'/'+pn
+                +'<br>PLANSZA: '+board+'/'+board
+                +playersText
+                +'<br>ZASADY:'+rules+btn);
+            }
+        });
+
+        var gbox = $('.makegrey');
+        var pnick = $('.put_nick');
+        function putNick(n,g){
+            $('input[name="nick"]').val("player"+(n+1));
+            $('input[name="gameid"]').val(g);
+            pnick.css('display','block');
+            setTimeout(function(){gbox.addClass('hide')},100);
+        };
+        gbox.click(function(){
+            if(gbox.hasClass('hide')){
+                gbox.removeClass('hide');
+                pnick.css('display','none');
+            }
+        });
+
+        function joinGame(){
+            let nick = $('input[name="nick"]').val();
+            if(nick!=""){
+                let gameid = $('input[name="gameid"]').val();
+                socket.emit('joinGame',{
+                    gameid: gameid,
+                    newplayer: nick
+                })
+                document.cookie = "gameid="+gameid;
+                setTimeout(function(){window.location = "queue.html"},100)
+            }
+        }
+    </script>
+</body>
+</html>
