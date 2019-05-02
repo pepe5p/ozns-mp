@@ -29,11 +29,12 @@ var serv = require('http').Server(app);
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/client/homepage.html')
 });
-
 app.use('/', express.static(__dirname + '/client'));
 
-serv.listen(PORT);
-console.log("server started");
+app.set( 'port', ( process.env.PORT || 2000 ));
+app.listen( app.get( 'port' ), function() {
+    console.log( 'Node server is running on port ' + app.get( 'port' ));
+});
 
 var gamesArray = [];
 function Game(p, player1, b, onz, color, combo, cards){
