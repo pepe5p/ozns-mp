@@ -24,7 +24,6 @@ const dcolors = [dred, dblue, dgreen, dyellow, dpink];
 var PORT = process.env.PORT || 2000;
 const express = require('express');
 var app = express();
-var serv = require('https').Server(app);
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/client/homepage.html')
@@ -220,7 +219,7 @@ function startGame(gameid){
 }
 
 var socketsList = [];
-var io = require("socket.io")(serv,{});
+var io = require("socket.io")(app);
 io.sockets.on('connection', function(socket){
     // console.log("socket connection");
     //START
