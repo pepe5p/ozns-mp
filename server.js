@@ -197,13 +197,11 @@ function startGame(gameid){
                 });
             }
 
-            if(g.moves==g.board*g.board || g.endThisGame==true){
-                g.endThisGame = false;
-                g.endgame();
-            }
+            if(g.moves==g.board*g.board || g.endThisGame==true) g.endGame();
         }
     }
     g.endGame = function(){
+        g.endThisGame = false;
         g.dotsArray.length = 0;
         g.linesArray.length = 0;
         g.dotsMax = 4;
