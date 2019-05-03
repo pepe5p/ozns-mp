@@ -23,7 +23,8 @@ const dcolors = [dred, dblue, dgreen, dyellow, dpink];
 
 var PORT = process.env.PORT || 2000;
 const express = require('express');
-const app = express();
+var app = express();
+var serv = require('https').Server(app);
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/client/homepage.html')
