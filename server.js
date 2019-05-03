@@ -22,16 +22,15 @@ const dcolors = [dred, dblue, dgreen, dyellow, dpink];
 //
 
 var PORT = process.env.PORT || 2000;
-const express = require('express');
-var app = express();
+var app = require('express')();
+var serv = require('http').Server(app);
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/client/homepage.html')
 });
 app.use('/', express.static(__dirname + '/client'));
 
-app.set('port', PORT);
-app.listen( app.get( 'port' ), function() {
+serv.listen( PORT, function() {
     console.log( 'Node server is running on port ' + app.get( 'port' ));
 });
 
@@ -219,7 +218,7 @@ function startGame(gameid){
 }
 
 var socketsList = [];
-var io = require("socket.io")(app);
+var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket){
     // console.log("socket connection");
     //START
