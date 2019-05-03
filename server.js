@@ -32,7 +32,7 @@ app.get('/', function(req, res){
 app.use('/', express.static(__dirname + '/client'));
 
 serv.listen( PORT, function() {
-    console.log( 'Node server is running on port ' + app.get( 'port' ));
+    console.log( 'Node server is running on port ' + PORT);
 });
 
 var gamesArray = [];
@@ -221,7 +221,6 @@ function startGame(gameid){
 var socketsList = [];
 var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket){
-    // console.log("socket connection");
     //START
     socket.emit('serverMsg',{
         msg:'connect with server'
@@ -229,11 +228,11 @@ io.sockets.on('connection', function(socket){
     socket.on('passId',function(data){
         socket.id = data.pcid;
         socketsList[socket.id] = socket;
-        // console.log("socket id = "+socket.id);
+        console.log("socket connection id = "+socket.id);
     })
     socket.on('disconnect',function(){
         delete socketsList[socket.id];
-        // console.log("socket disconnect id: "+socket.id);
+        console.log("socket disconnect id: "+socket.id);
     })
 
     //GAMES
@@ -244,12 +243,12 @@ io.sockets.on('connection', function(socket){
         socket.emit('getYoursGameId',{
 			gameindex: gameindex
 		});
-        // console.log("game successfully created with id: "+gameindex);
+        console.log("game successfully created with id: "+gameindex);
 	});
 	socket.on('joinGame', function(data){
         let g = gamesArray[data.gameid];
 		g.playersArray.push(new Player(socket.id, data.newplayer, undefined, undefined, "O", 0));
-        // console.log("player joined to game: "+data.gameid);
+        console.log("player joined to game: "+data.gameid);
         for(var i in g.playersArray){
             let socket = socketsList[g.playersArray[i].id];
             socket.emit('newPlayerInYourGame',{
