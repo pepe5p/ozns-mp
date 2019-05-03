@@ -24,7 +24,6 @@ const dcolors = [dred, dblue, dgreen, dyellow, dpink];
 var PORT = process.env.PORT || 2000;
 const express = require('express');
 const app = express();
-var serv = require('http').Server(app);
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/client/homepage.html')
@@ -163,6 +162,7 @@ function startGame(gameid){
                     tiles[tile].p = g.turn;
                     for(var i in g.playersArray){
                         let socket = socketsList[g.playersArray[i].id];
+                        console.log(socket);
                         socket.emit('newLetter',{
                             l: letter,
                             c: g.playersArray[g.turn].c,
