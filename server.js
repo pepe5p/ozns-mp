@@ -162,7 +162,6 @@ function startGame(gameid){
                     tiles[tile].p = g.turn;
                     for(var i in g.playersArray){
                         let socket = socketsList[g.playersArray[i].id];
-                        console.log(socket);
                         socket.emit('newLetter',{
                             l: letter,
                             c: g.playersArray[g.turn].c,
@@ -188,6 +187,8 @@ function startGame(gameid){
             g.dotsArray.length = g.dotsMax-4;
             g.move = 0;
 
+            console.log("SOCKETSY WsZYSKIE "+socketList);
+            console.log("GRACZE AKSBJDBJASBDBASKDGUASGU "+g.playersArray);
             for(var i in g.playersArray){
                 let socket = socketsList[g.playersArray[i].id];
                 socket.emit('changeTurn',{
@@ -230,10 +231,10 @@ io.sockets.on('connection', function(socket){
         socketsList[socket.id] = socket;
         console.log("socket connection id = "+socket.id);
     })
-    socket.on('disconnect',function(){
-        delete socketsList[socket.id];
-        console.log("socket disconnect id: "+socket.id);
-    })
+    // socket.on('disconnect',function(){
+    //     delete socketsList[socket.id];
+    //     console.log("socket disconnect id: "+socket.id);
+    // })
 
     //GAMES
     socket.on('createGame', function(data){
