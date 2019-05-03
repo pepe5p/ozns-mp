@@ -187,7 +187,7 @@ function startGame(gameid){
             g.dotsArray.length = g.dotsMax-4;
             g.move = 0;
 
-            console.log("SOCKETSY WsZYSKIE "+socketList);
+            console.log("SOCKETSY WsZYSKIE "+socketsList);
             console.log("GRACZE AKSBJDBJASBDBASKDGUASGU "+g.playersArray);
             for(var i in g.playersArray){
                 let socket = socketsList[g.playersArray[i].id];
