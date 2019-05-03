@@ -31,7 +31,7 @@ app.get('/', function(req, res){
 });
 app.use('/', express.static(__dirname + '/client'));
 
-app.set( 'port', ( process.env.PORT || 2000 ));
+app.set('port', PORT);
 app.listen( app.get( 'port' ), function() {
     console.log( 'Node server is running on port ' + app.get( 'port' ));
 });
