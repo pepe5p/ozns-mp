@@ -103,10 +103,11 @@
                 let x = (i%board)+1;
                 let tilelet = g.tilesArray[i].l;
                 $("#board > .flexbox").append('<div class="tile" name="x'+x+'y'+y+'" onclick="writelet('+x+','+y+')"></div>');
-                if(tilelet!==undefined) $("[name='x"+x+"y"+y+"']").html(tilelet);
-                console.log("x: "+x);
-                console.log("y: "+y);
-                console.log("tl: "+tilelet);
+                if(tilelet!==undefined) {
+                    let t = $("[name='x"+x+"y"+y+"']");
+                    t.html(tilelet);
+                    t.css(g.playersArray[g.tilesArray[i].p].c);
+                }
             }
             
             $('.aplayer').html(players[g.turn].name);
@@ -117,9 +118,10 @@
             $('.nplayer').css('color', players[nturn].c);
 
             for(i=0; i<players.length; i++){
-                $('.players').append('<div class="tablerow" style="color: '+players[i].c+'">'
-                +'<div class="rowname">'+players[i].name+'</div>'
-                +': <span id="p'+i+'">'+players[i].score+'</span></div>');
+                $('.players').append('<div class="tablerow">'
+                +'<div class="rowname" style="color: '+players[i].c+'">'+players[i].name+'</div>'
+                +'<div id="p'+i+' class="rowvalue" style="color: '+players[i].c+'">'+players[i].score+'</div>'
+                +'</div>');
 
                 if(players[i].id==pcid) {
                     pindex = i;
