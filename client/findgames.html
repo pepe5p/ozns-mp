@@ -38,33 +38,35 @@
             let gamesArray = data.msg;
             let games = $('#games');
             for(i=0; i<gamesArray.length; i++){
-                let rules = "";
-                let playersText = "";
-                let btn;
                 let g = gamesArray[i];
-                let players = g.playersArray;
-                let pn = g.pn;
-                for(j=0; j<players.length; j++){
-                    //WYPISUJE Z TABELI GIER Z TABELI GRACZY NAZWĘ ODPOWIEDNIEGO GRACZA XD
-                    playersText += "<br>GRACZ "+(j+1)+": "+players[j].name;
+                if(g!="empty"){
+                    let rules = "";
+                    let playersText = "";
+                    let btn;
+                    let players = g.playersArray;
+                    let pn = g.pn;
+                    for(j=0; j<players.length; j++){
+                        //WYPISUJE Z TABELI GIER Z TABELI GRACZY NAZWĘ ODPOWIEDNIEGO GRACZA XD
+                        playersText += "<br>GRACZ "+(j+1)+": "+players[j].name;
+                    }
+                    let board = g.board;
+                    let onz = g.onz;
+                    if(onz==true) rules+=" onz";
+                    let color = g.color;
+                    if(color==true) rules+=" color";
+                    let combo = g.combo;
+                    if(combo==true) rules+=" combo";
+                    let cards = g.cards;
+                    if(cards==true) rules+=" cards";
+
+                    if(players.length==pn) btn = "";
+                    else btn = '<button class="blur" type="button" onclick="putNick('+players.length+','+i+')">DOŁACZ</button></div>';
+
+                    games.append('<div class="tablerow">GRACZE: '+players.length+'/'+pn
+                    +'<br>PLANSZA: '+board+'/'+board
+                    +playersText
+                    +'<br>ZASADY:'+rules+btn);
                 }
-                let board = g.board;
-                let onz = g.onz;
-                if(onz==true) rules+=" onz";
-                let color = g.color;
-                if(color==true) rules+=" color";
-                let combo = g.combo;
-                if(combo==true) rules+=" combo";
-                let cards = g.cards;
-                if(cards==true) rules+=" cards";
-
-                if(players.length==pn) btn = "";
-                else btn = '<button class="blur" type="button" onclick="putNick('+players.length+','+i+')">DOŁACZ</button></div>';
-
-                games.append('<div class="tablerow">GRACZE: '+players.length+'/'+pn
-                +'<br>PLANSZA: '+board+'/'+board
-                +playersText
-                +'<br>ZASADY:'+rules+btn);
             }
         });
 

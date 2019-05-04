@@ -155,6 +155,9 @@
         socket.on('endGame', function(){
             $("#board > .flexbox").children(".tile").empty();
         });
+        socket.on('closeGame', function(){
+            window.location = "homepage.html";
+        });
         //FUNCTIONS
         function showcanv(){
             if(canvas==true) {

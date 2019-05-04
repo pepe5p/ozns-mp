@@ -230,8 +230,19 @@ io.sockets.on('connection', function(socket){
         console.log("socket disconnect id: "+socket.id);
         if(reason === 'transport close') {
             delete socketsList[socket.id];
+            let found = false;
+            for(i=0; found==false; i++){
+                let gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.id);
+                if(gameindex!=undefined) found = true;
+            }
+            for(var i in g.playersArray){
+                if(g.playersArray[i].id!=socket.id){
+                    let gamesocket = socketsList[g.playersArray[i].id];
+                    gamesocket.emit('closeGame');
+                }
+            }
+            gamesArray[gameindex] = "empty";
             socket.removeAllListeners();
-            console.log("socket disconnect "+socket.id);
         } else {
             console.log("socket disconnect because "+reason+" and try reconnect");
         }
