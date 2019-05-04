@@ -235,13 +235,15 @@ io.sockets.on('connection', function(socket){
                 let gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.id);
                 if(gameindex!=undefined) found = true;
             }
+            let g = gamesArray[gameindex];
             for(var i in g.playersArray){
                 if(g.playersArray[i].id!=socket.id){
                     let gamesocket = socketsList[g.playersArray[i].id];
                     gamesocket.emit('closeGame');
                 }
             }
-            gamesArray[gameindex] = "empty";
+            g = "empty";
+            console.log("game with id: "+gameindex+" was deleted");
             socket.removeAllListeners();
         } else {
             console.log("socket disconnect because "+reason+" and try reconnect");
