@@ -1,11 +1,4 @@
 
-var jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { window } = new JSDOM();
-const { document } = (new JSDOM('')).window;
-global.document = document;
-var $ = jQuery = require('jquery')(window);
-
 //KOLORKI
 const red = "#ff6666";
 const dred = "#882222";
@@ -111,18 +104,18 @@ function startGame(gameid){
                 let everythingOK = 0;
 
                 //TOP
-                if(jQuery.inArray(tiles[tileindex-g.board], tiles)!=-1){
+                if(tiles.indexOf(tiles[tileindex-g.board])>-1){
                     check[0] = tiles[tileindex-g.board].l;
                     if(check[0]===undefined) check[0] = "gitara";
                 }
                 //RIGHT
-                if(jQuery.inArray(tiles[tileindex+1], tiles)!=-1 && x<g.board){
+                if(tiles.indexOf(tiles[tileindex+1])>-1 && x<g.board){
                     check[1] = tiles[tileindex+1].l;
                     if(check[1]===undefined) check[1] = "gitara";
                 }
                 //BOTTOM
-                console.log('t1');
-                if(jQuery.inArray(tiles[tileindex+g.board], tiles)!=-1){
+                console.log('t1 '+tileindex+g.board);
+                if(tiles.indexOf(tiles[tileindex+g.board])>-1){
                     console.log('t2 '+tiles[tileindex+g.board].l);
                     check[2] = tiles[tileindex+g.board].l;
                     if(check[2]===undefined) {
@@ -131,7 +124,7 @@ function startGame(gameid){
                     }
                 }
                 //LEFT
-                if(jQuery.inArray(tiles[tileindex-1], tiles)!=-1 && x-1>0){
+                if(tiles.indexOf(tiles[tileindex-1])>-1 && x-1>0){
                     check[3] = tiles[tileindex-1].l;
                     if(check[3]===undefined) check[3] = "gitara";
                 }
