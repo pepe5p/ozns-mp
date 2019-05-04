@@ -223,13 +223,19 @@ io.sockets.on('connection', function(socket){
         socketsList[socket.id] = socket;
         console.log("socket connection id = "+socket.id);
     })
-    socket.on('disconnect',function(){
+    socket.on('disconnect', (reason) => {
         // setTimeout(function(){
         //     if(socketsList[socket.id][1]==) delete socketsList[socket.id];
         // },2000);
-        delete socketsList[socket.id];
-        socket.removeAllListeners();
         console.log("socket disconnect id: "+socket.id);
+        if (reason === 'io server disconnect') {
+            socket.connect();
+            console.log("socket disconnect and try reconnect");
+        } else {
+            delete socketsList[socket.id];
+            socket.removeAllListeners();
+            console.log("socket disconnect because "+reason);
+        }
     })
 
     //GAMES
