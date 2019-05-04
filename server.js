@@ -223,10 +223,13 @@ io.sockets.on('connection', function(socket){
         socketsList[socket.id] = socket;
         console.log("socket connection id = "+socket.id);
     })
-    // socket.on('disconnect',function(){
-    //     delete socketsList[socket.id];
-    //     console.log("socket disconnect id: "+socket.id);
-    // })
+    socket.on('disconnect',function(){
+        // setTimeout(function(){
+        //     if(socketsList[socket.id][1]==) delete socketsList[socket.id];
+        // },2000);
+        // socket.removeAllListeners();
+        console.log("socket disconnect id: "+socket.id);
+    })
 
     //GAMES
     socket.on('createGame', function(data){

@@ -139,7 +139,7 @@
             let tile = $('.tile[name="x'+data.x+'y'+data.y+'"]');
             tile.html(data.l);
             tile.css('color', data.c);
-            if(data.oom==true) $('#turn').css('background-color', g.playersArray[data.pindex].c);
+            if(data.oom==true) $('#turn').css('background-color', g.playersArray[pindex].c);
         });
         socket.on('changeTurn', function(data){
             $('#turn').css('background-color', background);
