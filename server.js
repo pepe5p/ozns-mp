@@ -236,7 +236,7 @@ io.sockets.on('connection', function(socket){
             let gameindex;
             for(i=0; found==false; i++){
                 gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.id);
-                if(gameindex!=undefined) found = true;
+                if(gameindex>-1) found = true;
             }
             let g = gamesArray[gameindex];
             if(g.started==true){
