@@ -32,7 +32,7 @@ var gamesArray = [];
 function Game(p, player1, b, onz, color, combo, cards){
 	this.pn = p;
 	this.playersArray = [player1];
-    this.board = b;
+    this.board = parseInt(b);
     this.onz = onz;
     this.color = color;
     this.combo = combo;
@@ -114,13 +114,10 @@ function startGame(gameid){
                     if(check[1]===undefined) check[1] = "gitara";
                 }
                 //BOTTOM
-                console.log('t1 '+tileindex+g.board);
                 if(tiles.indexOf(tiles[tileindex+g.board])>-1){
-                    console.log('t2 '+tiles[tileindex+g.board].l);
                     check[2] = tiles[tileindex+g.board].l;
                     if(check[2]===undefined) {
                         check[2] = "gitara";
-                        console.log('t3 '+check[2]);
                     }
                 }
                 //LEFT
