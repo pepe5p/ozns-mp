@@ -30,6 +30,7 @@ serv.listen( PORT, function() {
 
 var gamesArray = [];
 function Game(p, player1, b, onz, color, combo, cards){
+    this.started = false;
 	this.pn = p;
 	this.playersArray = [player1];
     this.board = parseInt(b);
@@ -57,6 +58,7 @@ function startGame(gameid){
     console.log('game '+gameid+" started");
     let g = gamesArray[gameid];
 
+    g.started = true;
     g.endThisGame = false;
     g.whoStarts = 0;
     g.turn = 0;
@@ -231,20 +233,23 @@ io.sockets.on('connection', function(socket){
         if(reason === 'transport close') {
             delete socketsList[socket.id];
             let found = false;
+            let gameindex;
             for(i=0; found==false; i++){
-                let gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.id);
+                gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.id);
                 if(gameindex!=undefined) found = true;
             }
             let g = gamesArray[gameindex];
-            for(var i in g.playersArray){
-                if(g.playersArray[i].id!=socket.id){
-                    let gamesocket = socketsList[g.playersArray[i].id];
-                    gamesocket.emit('closeGame');
+            if(g.started==true){
+                for(var i in g.playersArray){
+                    if(g.playersArray[i].id!=socket.id){
+                        let gamesocket = socketsList[g.playersArray[i].id];
+                        gamesocket.emit('closeGame');
+                    }
                 }
+                g = "empty";
+                console.log("game with id: "+gameindex+" was deleted");
+                socket.removeAllListeners();
             }
-            g = "empty";
-            console.log("game with id: "+gameindex+" was deleted");
-            socket.removeAllListeners();
         } else {
             console.log("socket disconnect because "+reason+" and try reconnect");
         }
