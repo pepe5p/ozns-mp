@@ -100,10 +100,10 @@ function startGame(gameid){
     g.writeLet = function(pindex, x, y){
         if(pindex==g.turn){
             var letter = g.playersArray[g.turn].al;
-            let tile = x-1+((y-1)*g.board);
+            let tileindex = x-1+((y-1)*g.board);
             let tiles = g.tilesArray;
 
-            if(tile.l===undefined)
+            if(tiles[tileinex].l===undefined)
             {
                 x = parseInt(x);
                 y = parseInt(y);
@@ -111,25 +111,25 @@ function startGame(gameid){
                 let everythingOK = 0;
 
                 //TOP
-                if(jQuery.inArray(tiles[tile-g.board], tiles)!=-1){
-                    check[0] = tiles[tile-g.board].l;
-                    if(check[0]=="") check[0] = "gitara";
-                } else check[0] = "";
+                if(jQuery.inArray(tiles[tileindex-g.board], tiles)!=-1){
+                    check[0] = tiles[tileindex-g.board].l;
+                    if(check[0]===undefined) check[0] = "gitara";
+                }
                 //RIGHT
-                if(jQuery.inArray(tiles[tile+1], tiles)!=-1 && x<g.board){
-                    check[1] = tiles[tile+1].l;
-                    if(check[1]=="") check[1] = "gitara";
-                } else check[1] = "";
+                if(jQuery.inArray(tiles[tileindex+1], tiles)!=-1 && x<g.board){
+                    check[1] = tiles[tileindex+1].l;
+                    if(check[1]===undefined) check[1] = "gitara";
+                }
                 //BOTTOM
-                if(jQuery.inArray(tiles[tile+g.board], tiles)!=-1){
-                    check[2] = tiles[tile+g.board].l;
-                    if(check[2]=="") check[2] = "gitara";
-                } else check[2] = "";
+                if(jQuery.inArray(tiles[(tileindex+g.board)], tiles)!=-1){
+                    check[2] = tiles[(tileindex+g.board)].l;
+                    if(check[2]===undefined) check[2] = "gitara";
+                }
                 //LEFT
-                if(jQuery.inArray(tiles[tile-1], tiles)!=-1 && x-1>0){
-                    check[3] = tiles[tile-1].l;
-                    if(check[3]=="") check[3] = "gitara";
-                } else check[3] = "";
+                if(jQuery.inArray(tiles[tileindex-1], tiles)!=-1 && x-1>0){
+                    check[3] = tiles[tileindex-1].l;
+                    if(check[3]===undefined) check[3] = "gitara";
+                }
 
                 //ANGLE ANTI BLOCK OR //BLOCK
                 var ablockcheck = 0;
@@ -158,8 +158,8 @@ function startGame(gameid){
                 if(g.move>0) everythingOK = 0;
 
                 if(everythingOK == 1){
-                    tiles[tile].l = letter;
-                    tiles[tile].p = g.turn;
+                    tiles[tileindex].l = letter;
+                    tiles[tileindex].p = g.turn;
                     for(var i in g.playersArray){
                         let socket = socketsList[g.playersArray[i].id];
                         socket.emit('newLetter',{

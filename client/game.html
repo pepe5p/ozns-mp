@@ -96,13 +96,14 @@
             g = data.msg;
             let players = g.playersArray;
             let board = g.board;
-            let full = g.board*g.board;
 
             var y = 0;
             for(i=0; i<(board*board); i++){
                 if((i%board)==0) y++;
                 let x = (i%board)+1;
+                let tilelet = g.tilesArray[i].l;
                 $("#board > .flexbox").append('<div class="tile" name="x'+x+'y'+y+'" onclick="writelet('+x+','+y+')"></div>');
+                if(tilelet!==undefined) $("x"+x+"y"+y).html(tilelet);
             }
             
             $('.aplayer').html(players[g.turn].name);
@@ -172,7 +173,6 @@
             }
         }
         function writelet(x, y){
-            console.log(gameid);
             socket.emit('writeLet',{
                 pindex: pindex,
                 gameid: gameid,
