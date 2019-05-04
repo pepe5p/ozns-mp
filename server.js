@@ -228,13 +228,13 @@ io.sockets.on('connection', function(socket){
         //     if(socketsList[socket.id][1]==) delete socketsList[socket.id];
         // },2000);
         console.log("socket disconnect id: "+socket.id);
-        if (reason === 'io server disconnect') {
-            socket.connect();
-            console.log("socket disconnect and try reconnect");
-        } else {
+        if(reason === 'transport close') {
             delete socketsList[socket.id];
             socket.removeAllListeners();
             console.log("socket disconnect because "+reason);
+        } else {
+            socket.connect();
+            console.log("socket disconnect and try reconnect");
         }
     })
 
