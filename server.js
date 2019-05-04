@@ -227,7 +227,8 @@ io.sockets.on('connection', function(socket){
         // setTimeout(function(){
         //     if(socketsList[socket.id][1]==) delete socketsList[socket.id];
         // },2000);
-        // socket.removeAllListeners();
+        delete socketsList[socket.id];
+        socket.removeAllListeners();
         console.log("socket disconnect id: "+socket.id);
     })
 
