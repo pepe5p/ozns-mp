@@ -121,9 +121,14 @@ function startGame(gameid){
                     if(check[1]===undefined) check[1] = "gitara";
                 }
                 //BOTTOM
-                if(jQuery.inArray(tiles[(tileindex+g.board)], tiles)!=-1){
-                    check[2] = tiles[(tileindex+g.board)].l;
-                    if(check[2]===undefined) check[2] = "gitara";
+                console.log('t1');
+                if(jQuery.inArray(tiles[tileindex+g.board], tiles)!=-1){
+                    console.log('t2 '+tiles[tileindex+g.board].l);
+                    check[2] = tiles[tileindex+g.board].l;
+                    if(check[2]===undefined) {
+                        check[2] = "gitara";
+                        console.log('t3 '+check[2]);
+                    }
                 }
                 //LEFT
                 if(jQuery.inArray(tiles[tileindex-1], tiles)!=-1 && x-1>0){
@@ -187,8 +192,6 @@ function startGame(gameid){
             g.dotsArray.length = g.dotsMax-4;
             g.move = 0;
 
-            console.log("SOCKETSY WsZYSKIE "+socketsList);
-            console.log("GRACZE AKSBJDBJASBDBASKDGUASGU "+g.playersArray);
             for(var i in g.playersArray){
                 let socket = socketsList[g.playersArray[i].id];
                 socket.emit('changeTurn',{
