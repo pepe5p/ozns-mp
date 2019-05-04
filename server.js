@@ -103,7 +103,7 @@ function startGame(gameid){
             let tileindex = x-1+((y-1)*g.board);
             let tiles = g.tilesArray;
 
-            if(tiles[tileinex].l===undefined)
+            if(tiles[tileindex].l===undefined)
             {
                 x = parseInt(x);
                 y = parseInt(y);
