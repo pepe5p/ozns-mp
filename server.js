@@ -231,10 +231,9 @@ io.sockets.on('connection', function(socket){
         if(reason === 'transport close') {
             delete socketsList[socket.id];
             socket.removeAllListeners();
-            console.log("socket disconnect because "+reason);
+            console.log("socket disconnect "+socket.id);
         } else {
-            socket.connect();
-            console.log("socket disconnect and try reconnect");
+            console.log("socket disconnect because "+reason+" and try reconnect");
         }
     })
 
