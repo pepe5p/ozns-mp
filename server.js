@@ -116,9 +116,7 @@ function startGame(gameid){
                 //BOTTOM
                 if(tiles.indexOf(tiles[tileindex+g.board])>-1){
                     check[2] = tiles[tileindex+g.board].l;
-                    if(check[2]===undefined) {
-                        check[2] = "gitara";
-                    }
+                    if(check[2]===undefined) check[2] = "gitara";
                 }
                 //LEFT
                 if(tiles.indexOf(tiles[tileindex-1])>-1 && x-1>0){
@@ -155,17 +153,20 @@ function startGame(gameid){
                 if(everythingOK == 1){
                     tiles[tileindex].l = letter;
                     tiles[tileindex].p = g.turn;
+                    g.move++;
+                    g.moves++;
                     for(var i in g.playersArray){
                         let socket = socketsList[g.playersArray[i].id];
+                        let outOfMoves = false;
+                        if(g.move>0 && i==g.turn) outOfMoves = true;
                         socket.emit('newLetter',{
                             l: letter,
                             c: g.playersArray[g.turn].c,
                             x: x,
-                            y: y
+                            y: y,
+                            oom: outOfMoves
                         });
                     }
-                    g.move++;
-                    g.moves++;
                 }
             }
         }
