@@ -30,7 +30,7 @@ serv.listen( PORT, function() {
 
 var gamesArray = [];
 function Game(p, player1, b, onz, color, combo, cards){
-    this.status = "queue";
+    this.status = "queue init";
 	this.pn = p;
 	this.playersArray = [player1];
     this.board = parseInt(b);
@@ -246,12 +246,12 @@ io.sockets.on('connection', function(socket){
                 }).indexOf(socket.myid);
                 if(gameindex>-1) found = true;
             }
-            if(socketsList[socket.myid].connected==false && found==true){
-                let g = gamesArray[gameindex];
+            let g = gamesArray[gameindex];
+            if(found==true && g.status!="queue init"){
                 let closeThisGame = true;
                 if(g.playersArray[0].id==socket.myid && g.playersArray[0].host==true){
                     closeThisGame = false;
-                    g.playersArray[0].host = false;
+                    g.status = "queue";
                 }
                 if(closeThisGame==true){
                     for(var i in g.playersArray){

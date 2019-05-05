@@ -73,6 +73,9 @@
                 }
             }
         });
+        socket.on('closeGame', function(){
+            window.location = "homepage.html";
+        });
 
         var gbox = $('.makegrey');
         var pnick = $('.put_nick');
