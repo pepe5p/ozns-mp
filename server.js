@@ -240,17 +240,18 @@ io.sockets.on('connection', function(socket){
             let found = false;
             let gameindex;
             for(i=0; (found==false && i<100); i++){
-                gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.myid);
+                gameindex = gamesArray.map(function(e) {
+                    if(e.playersArray[i]) return e.playersArray[i].id;
+                    else return -1;
+                }).indexOf(socket.myid);
                 if(gameindex>-1) found = true;
             }
             if(found==true){
                 let g = gamesArray[gameindex];
                 let closeThisGame = true;
-                for(var i in g.playersArray){
-                    if(g.playersArray[i].id==socket.myid && g.playersArray[i].host==true){
-                        closeThisGame = false;
-                        g.playersArray[i].host = false;
-                    }
+                if(g.playersArray[0].id==socket.myid && g.playersArray[0].host==true){
+                    closeThisGame = false;
+                    g.playersArray[0].host = false;
                 }
                 if(closeThisGame==true){
                     for(var i in g.playersArray){
@@ -270,7 +271,9 @@ io.sockets.on('connection', function(socket){
     //GAMES
     socket.on('createGame', function(data){
         gamesArray.push(new Game(data.p, new Player(socket.myid, true, data.player1, undefined, undefined, "O", 0), data.board, data.onz, data.color, data.combo, data.cards));
-        let gameindex = gamesArray.map(function(e) { return e.playersArray[0].id; }).indexOf(socket.myid);
+        let gameindex = gamesArray.map(function(e) {
+            if(e.playersArray[0]) return e.playersArray[0].id; 
+        }).indexOf(socket.myid);
         
         socket.emit('getYoursGameId',{
 			gameindex: gameindex
