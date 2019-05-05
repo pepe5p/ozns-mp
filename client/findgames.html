@@ -39,7 +39,11 @@
             let games = $('#games');
             for(i=0; i<gamesArray.length; i++){
                 let g = gamesArray[i];
-                if(g!="empty"){
+                if(g.status=="closed" || g==undefined){
+                    console.log("game "+i+" doesn't exists");
+                }
+                else {
+                    console.log("game "+i+" exists");
                     let rules = "";
                     let playersText = "";
                     let btn;
