@@ -39,9 +39,8 @@ function Game(p, player1, b, onz, color, combo, cards){
     this.combo = combo;
     this.cards = cards;
 }
-function Player(id, host, name, c, dc, al, score){
+function Player(id, name, c, dc, al, score){
     this.id = id;
-    this.host = host;
     this.name = name;
     this.c = c;
     this.dc = dc;
@@ -247,9 +246,9 @@ io.sockets.on('connection', function(socket){
                 if(gameindex>-1) found = true;
             }
             let g = gamesArray[gameindex];
-            if(found==true && g.status!="queue init"){
+            if(g.status!="queue init" && found==true){
                 let closeThisGame = true;
-                if(g.playersArray[0].id==socket.myid && g.playersArray[0].host==true){
+                if(g.playersArray[0].id==socket.myid && g.status=="queue init"){
                     closeThisGame = false;
                     g.status = "queue";
                 }
@@ -270,7 +269,7 @@ io.sockets.on('connection', function(socket){
 
     //GAMES
     socket.on('createGame', function(data){
-        gamesArray.push(new Game(data.p, new Player(socket.myid, true, data.player1, undefined, undefined, "O", 0), data.board, data.onz, data.color, data.combo, data.cards));
+        gamesArray.push(new Game(data.p, new Player(socket.myid, data.player1, undefined, undefined, "O", 0), data.board, data.onz, data.color, data.combo, data.cards));
         let gameindex = gamesArray.map(function(e) {
             if(e.playersArray[0]) return e.playersArray[0].id; 
         }).indexOf(socket.myid);
@@ -282,7 +281,7 @@ io.sockets.on('connection', function(socket){
 	});
 	socket.on('joinGame', function(data){
         let g = gamesArray[data.gameid];
-		g.playersArray.push(new Player(socket.myid, false, data.newplayer, undefined, undefined, "O", 0));
+		g.playersArray.push(new Player(socket.myid, data.newplayer, undefined, undefined, "O", 0));
         console.log('\x1b[0m%s%s\x1b[32m%s\x1b[0m', 'game with index: ', data.gameid, " has new player");
         for(var i in g.playersArray){
             let socket = socketsList[g.playersArray[i].id];
