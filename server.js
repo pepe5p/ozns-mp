@@ -246,7 +246,7 @@ io.sockets.on('connection', function(socket){
                 }).indexOf(socket.myid);
                 if(gameindex>-1) found = true;
             }
-            if(found==true){
+            if(socketsList[socket.myid].connected==false && found==true){
                 let g = gamesArray[gameindex];
                 let closeThisGame = true;
                 if(g.playersArray[0].id==socket.myid && g.playersArray[0].host==true){
