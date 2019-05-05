@@ -39,8 +39,9 @@ function Game(p, player1, b, onz, color, combo, cards){
     this.combo = combo;
     this.cards = cards;
 }
-function Player(id, name, c, dc, al, score){
+function Player(id, host, name, c, dc, al, score){
     this.id = id;
+    this.host = host;
     this.name = name;
     this.c = c;
     this.dc = dc;
@@ -217,7 +218,6 @@ var socketsList = [];
 var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket){
 
-    let ingame = false;
     //START
     socket.emit('serverMsg',{
         msg:'connect with server'
@@ -231,33 +231,45 @@ io.sockets.on('connection', function(socket){
     })
     socket.on('disconnect', (reason) => {
         setTimeout(function(){
-            if(socketsList[socket.myid].connected==false || ingame==false){
+            if(socketsList[socket.myid].connected==false){
                 if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
                 else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
-                let found = false;
-                let gameindex;
-                for(i=0; (found==false && i<50); i++){
-                    gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.myid);
-                    if(gameindex>-1) found = true;
-                }
+                // delete socketsList[socket.myid];
+                socket.removeAllListeners();
+            }
+            let found = false;
+            let gameindex;
+            for(i=0; (found==false && i<100); i++){
+                gameindex = gamesArray.map(function(e) { return e.playersArray[i].id; }).indexOf(socket.myid);
+                if(gameindex>-1) found = true;
+            }
+            if(found==true){
                 let g = gamesArray[gameindex];
+                let closeThisGame = true;
                 for(var i in g.playersArray){
-                    if(g.playersArray[i].id!=socket.myid){
-                        let gamesocket = socketsList[g.playersArray[i].id];
-                        gamesocket.emit('closeGame');
+                    if(g.playersArray[i].id==socket.myid && g.playersArray[i].host==true){
+                        closeThisGame = false;
+                        g.playersArray[i].host = false;
                     }
                 }
-                g.status = "closed";
-                console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
-                delete socketsList[socket.myid];
-                socket.removeAllListeners();
+                if(closeThisGame==true){
+                    for(var i in g.playersArray){
+                        if(g.playersArray[i].id!=socket.myid){
+                            let gamesocket = socketsList[g.playersArray[i].id];
+                            gamesocket.emit('closeGame');
+                        }
+                    }
+                    g.status = "closed";
+                    g.playersArray = [];
+                    console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
+                }
             }
         },3000);
     })
 
     //GAMES
     socket.on('createGame', function(data){
-        gamesArray.push(new Game(data.p, new Player(socket.myid, data.player1, undefined, undefined, "O", 0), data.board, data.onz, data.color, data.combo, data.cards));
+        gamesArray.push(new Game(data.p, new Player(socket.myid, true, data.player1, undefined, undefined, "O", 0), data.board, data.onz, data.color, data.combo, data.cards));
         let gameindex = gamesArray.map(function(e) { return e.playersArray[0].id; }).indexOf(socket.myid);
         
         socket.emit('getYoursGameId',{
@@ -267,7 +279,7 @@ io.sockets.on('connection', function(socket){
 	});
 	socket.on('joinGame', function(data){
         let g = gamesArray[data.gameid];
-		g.playersArray.push(new Player(socket.myid, data.newplayer, undefined, undefined, "O", 0));
+		g.playersArray.push(new Player(socket.myid, false, data.newplayer, undefined, undefined, "O", 0));
         console.log('\x1b[0m%s%s\x1b[32m%s\x1b[0m', 'game with index: ', data.gameid, " has new player");
         for(var i in g.playersArray){
             let socket = socketsList[g.playersArray[i].id];
@@ -280,12 +292,10 @@ io.sockets.on('connection', function(socket){
 	});
 	socket.on('showGames', function(data){
         if(data.all == true){
-            ingame = false;
             socket.emit('getGames',{
                 msg: gamesArray
             });
         } else {
-            ingame = true;
             socket.emit('getGames',{
                 msg: gamesArray[data.index]
             });
