@@ -58,7 +58,7 @@ function startGame(gameid){
     console.log('\x1b[0m%s%s\x1b[34m%s\x1b[0m', 'game with index: ', gameid, " started");
     let g = gamesArray[gameid];
 
-    g.status = "started";
+    g.status = "game init";
     g.endThisGame = false;
     g.whoStarts = 0;
     g.turn = 0;
@@ -246,13 +246,8 @@ io.sockets.on('connection', function(socket){
                 if(gameindex>-1) found = true;
             }
             let g = gamesArray[gameindex];
-            if(g.status!="queue init" && found==true){
-                let closeThisGame = true;
-                if(g.playersArray[0].id==socket.myid && g.status=="queue init"){
-                    closeThisGame = false;
-                    g.status = "queue";
-                }
-                if(closeThisGame==true){
+            if(found==true){
+                if(g.status=="queue" || g.status=="started"){
                     for(var i in g.playersArray){
                         if(g.playersArray[i].id!=socket.myid){
                             let gamesocket = socketsList[g.playersArray[i].id];
@@ -263,6 +258,8 @@ io.sockets.on('connection', function(socket){
                     g.playersArray = [];
                     console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
                 }
+                if(g.playersArray[0].id==socket.myid && g.status=="queue init") g.status = "queue";
+                if(g.status=="qame init") g.status = "started";
             }
         },3000);
     })
