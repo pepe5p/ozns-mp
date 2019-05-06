@@ -95,6 +95,7 @@ $(function() {
         $('.nplayer').html(g.playersArray[data.nturn].name);
         $('.nplayer').css('color', g.playersArray[data.nturn].c);
         
+        g.turn = data.aturn;
         g.move = 0;
         g.dotsArray.length = g.dotsMax-4;
 
@@ -107,7 +108,9 @@ $(function() {
         g.move--;
         $('#turn').css('background-color', background);
     });
-    socket.on('endGame', function(){
+    socket.on('endGame', function(data){
+        dots.length = 0;
+        g.turn = data.turn;
         $("#board > .flexbox").children(".tile").empty();
     });
     socket.on('closeGame', function(){

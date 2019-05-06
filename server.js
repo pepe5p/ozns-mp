@@ -235,7 +235,9 @@ function startGame(gameindex){
         g.turn = g.whoStarts;
         for(var i in g.playersArray){
             let socket = socketsList[g.playersArray[i].id];
-            socket.emit('endGame');
+            socket.emit('endGame', {
+                turn: g.turn
+            });
         }
         g.init();
     }
