@@ -152,11 +152,11 @@
                 gameGot = true;
             });
             socket.on('newLetter', function(data){
-                move++;
+                g.move++;
                 let tile = $('.tile[name="x'+data.x+'y'+data.y+'"]');
                 tile.html(data.l);
                 tile.css('color', data.c);
-                if(data.oom==true && move==1) $('#turn').css('background-color', g.playersArray[pindex].c);
+                if(data.oom==true && g.move==1) $('#turn').css('background-color', g.playersArray[pindex].c);
             });
             socket.on('newDot', function(data){
                 g.dotsArray.push(new Dot(data.end, data.x, data.y, data.c, data.w));
@@ -171,7 +171,7 @@
                 $('.nplayer').html(g.playersArray[data.nturn].name);
                 $('.nplayer').css('color', g.playersArray[data.nturn].c);
                 
-                move = 0;
+                g.move = 0;
                 g.dotsArray.length = g.dotsMax-4;
 
                 if(data.aturn==pindex) play("yourturn", 0, 0);

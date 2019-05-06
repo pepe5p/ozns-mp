@@ -151,7 +151,6 @@
             }
         }
         socket.on('getYoursGameIndex',function(data){
-            console.log(data);
             document.cookie = "gameindex="+data.gameindex;
             setTimeout(function(){window.location = "queue.html"},100)
         })
