@@ -399,7 +399,7 @@ io.sockets.on('connection', function(socket){
                         t2.x-xdistance==t3.x &&t2.y-ydistance==t3.y){
                             //ONZ CHECK
                             if(t1.l=="O" && t2.l=="N" && t3.l=="Z"){
-                                console.log("ONZ");
+                                console.log("game with id: "+data.gameindex+" -> ONZ");
                                 g.linesArray.push([id1,id2,id3]);
                                 g.play("onz", 3, 1);
                             }
@@ -433,7 +433,7 @@ io.sockets.on('connection', function(socket){
                         if(lineBlock==false){
                             //OZNS CHECK
                             if(t1.l=="O" && t2.l=="Z" && t3.l=="N" && t4.l=="S"){
-                                console.log("OZNS");
+                                console.log("game with id: "+data.gameindex+" -> OZNS");
                                 g.linesArray.push([id1,id2,id3,id4]);
                                 doubleDotsBlock = 0;
                                 g.endThisGame = true;
@@ -446,7 +446,7 @@ io.sockets.on('connection', function(socket){
                             }
                             //KOLOR CHECK
                             if(g.color4==true && t1.p!==undefined && t2.p==t1.p && t3.p==t1.p && t4.p==t1.p){
-                                console.log("COLOR");
+                                console.log("game with id: "+data.gameindex+" -> COLOR");
                                 g.linesArray.push([id1,id2,id3,id4]);
                                 g.play("color", doubleDotsBlock, 1);
                             }
@@ -474,7 +474,7 @@ io.sockets.on('connection', function(socket){
                                 else if(comlet=="O") cbcheck = cbcheck+1000;
                             }
                             if(cbcheck==1111){
-                                console.log("COMBO");
+                                console.log("game with id: "+data.gameindex+" -> COMBO");
                                 g.linesArray.push([id1,id2,id3,id4]);
                                 g.move--;
                                 g.play("combo", 4, 0);

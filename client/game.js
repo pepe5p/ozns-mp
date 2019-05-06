@@ -108,6 +108,7 @@ $(function() {
     });
     socket.on('endGame', function(data){
         g.dotsArray.length = 0;
+        g.dotsMax = 4;
         g.turn = data.turn;
         $("#board > .flexbox").children(".tile").empty();
     });
@@ -201,7 +202,9 @@ $(function() {
         requestAnimationFrame(animate);
         if(gameGot==true){
             ctx.clearRect(0, 0, c.width, c.height);
+            console.log(g.dotsArray);
             for(var i = 0; i < g.dotsArray.length; i++){
+                console.log(g.dotsArray[i]);
                 g.dotsArray[i].update();
                 if(typeof g.dotsArray[i+1] !== 'undefined'){
                     let x1 = g.dotsArray[i].x+5;
