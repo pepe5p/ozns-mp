@@ -351,7 +351,7 @@ io.sockets.on('connection', function(socket){
     });
     socket.on('writeDot', function(data){
         //UWAGA NA CHEATERÓW
-        let g = gamesArray[data.gameindex]
+        let g = gamesArray[data.gameindex];
 
         if(g.turn==data.pindex){
             let x = data.x;
