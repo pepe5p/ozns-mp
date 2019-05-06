@@ -354,11 +354,9 @@ io.sockets.on('connection', function(socket){
         let g = gamesArray[data.gameindex]
 
         if(g.turn==data.pindex){
-            console.log("active player");
             let x = data.x;
             let y = data.y;
             if(g.dotsArray.length<g.dotsMax){
-                console.log("not out of moves");
                 let tileId = (y-1)*g.board+x-1;
                 let correction = (g.tilewidth/2)+(dotwidth/2)
                 let canvx = (x*g.tilewidth)-correction;
@@ -378,7 +376,6 @@ io.sockets.on('connection', function(socket){
 
                 let l = g.linesArray;
                 if(g.onz==true && g.dotsArray.length==g.dotsMax-1){
-                    console.log("3 checked");
                     let id1 = g.dotsArray[g.dotsMax-4].tileId;
                     let id2 = g.dotsArray[g.dotsMax-3].tileId;
                     let id3 = g.dotsArray[g.dotsMax-2].tileId;
@@ -390,16 +387,14 @@ io.sockets.on('connection', function(socket){
                         }
                     }
                     if(lineBlock==false){
-                        console.log("not lineblock");
                         let t1 = g.tilesArray[id1];
                         let t2 = g.tilesArray[id2];
                         let t3 = g.tilesArray[id3];
-                        let xdistance = t1.c-t2.c;
-                        let ydistance = t1.w-t2.w;
+                        let xdistance = t1.x-t2.x;
+                        let ydistance = t1.y-t2.y;
                         //3 W LINII CHECK
                         if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
-                        t2.c-xdistance==t3.c &&t2.w-ydistance==t3.w){
-                            console.log("3 in line");
+                        t2.x-xdistance==t3.x &&t2.y-ydistance==t3.y){
                             //ONZ CHECK
                             if(t1.l=="O" && t2.l=="N" && t3.l=="Z"){
                                 console.log("ONZ");
@@ -409,7 +404,6 @@ io.sockets.on('connection', function(socket){
                         }
                     }
                 } else if(g.dotsArray.length==g.dotsMax){
-                    console.log("4 checked");
                     let id1 = g.dotsArray[g.dotsMax-4].tileId;
                     let id2 = g.dotsArray[g.dotsMax-3].tileId;
                     let id3 = g.dotsArray[g.dotsMax-2].tileId;
@@ -418,16 +412,15 @@ io.sockets.on('connection', function(socket){
                     let t2 = g.tilesArray[id2];
                     let t3 = g.tilesArray[id3];
                     let t4 = g.tilesArray[id4];
-                    let xdistance = t1.c-t2.c;
-                    let ydistance = t1.w-t2.w;
+                    let xdistance = t1.x-t2.x;
+                    let ydistance = t1.y-t2.y;
                     //DLA COMBA
-                    let xdistance2 = t2.c-t3.c;
-                    let ydistance2 = t2.w-t3.w;
+                    let xdistance2 = t2.x-t3.x;
+                    let ydistance2 = t2.y-t3.y;
                     //4 W LINII CHECK
                     if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
-                    t2.c-xdistance==t3.c && t2.w-ydistance==t3.w && t3.c-xdistance==t4.c && 
-                    t3.w-ydistance==t4.w && (xdistance!=0 || ydistance !=0)){
-                        console.log("4 in line");
+                    t2.x-xdistance==t3.x && t2.y-ydistance==t3.y && t3.x-xdistance==t4.x && 
+                    t3.y-ydistance==t4.y && (xdistance!=0 || ydistance !=0)){
                         let doubleDotsBlock = 4;
                         //DOUBLE LINE BLOCK
                         let lineBlock = false;
@@ -436,7 +429,6 @@ io.sockets.on('connection', function(socket){
                             (id1==l[i][3] && id2==l[i][2] && id3==l[i][1] && id4==l[i][0])) lineBlock = true;
                         }
                         if(lineBlock==false){
-                            console.log("not lineblock");
                             //OZNS CHECK
                             if(t1.l=="O" && t2.l=="Z" && t3.l=="N" && t4.l=="S"){
                                 console.log("OZNS");
@@ -460,8 +452,7 @@ io.sockets.on('connection', function(socket){
                     }//COMBO CHECK
                     else if(g.combo==true && xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
                     xdistance2>=-1 && xdistance2<=1 && ydistance2 >=-1 && ydistance2<=1 &&
-                    t1.c-xdistance2==t4.c && t1.w-ydistance2==t4.w){
-                        console.log("circle checked");
+                    t1.x-xdistance2==t4.x && t1.y-ydistance2==t4.y){
                         //DOUBLE LINE BLOCK
                         let lineBlock = false;
                         for(i=0; i<l.length; i++){
@@ -471,7 +462,6 @@ io.sockets.on('connection', function(socket){
                             }
                         }
                         if(lineBlock==false){
-                            console.log("not lineblock");
                             let cbcheck = 0;
                             let comlet = 0;
                             for(i=4; i>0; i--){
