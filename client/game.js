@@ -100,7 +100,7 @@ $(function() {
 
         if(data.aturn==pindex) play("yourturn", 0, 0);
     });
-    socket.on('newPlay', function(){
+    socket.on('newPlay', function(data){
         play(data.name, data.newdotsMax, data.points);
     });
     socket.on('combo', function(){
