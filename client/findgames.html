@@ -20,7 +20,7 @@
     <div class="put_nick xcbox ycbox box300 sborder">
         <div class="tablerow">
             <input name="nick" class="blur" type="text">
-            <input name="gameid" type="hidden">
+            <input name="gameindex" type="hidden">
         </div>
         <div class="tablerow">
             <button class="sblur" type="button" onclick="joinGame()">DOŁACZ</button>
@@ -81,7 +81,7 @@
         var pnick = $('.put_nick');
         function putNick(n,g){
             $('input[name="nick"]').val("player"+(n+1));
-            $('input[name="gameid"]').val(g);
+            $('input[name="gameindex"]').val(g);
             pnick.css('display','block');
             setTimeout(function(){gbox.addClass('hide')},100);
         };
@@ -95,12 +95,12 @@
         function joinGame(){
             let nick = $('input[name="nick"]').val();
             if(nick!=""){
-                let gameid = $('input[name="gameid"]').val();
+                let gameindex = $('input[name="gameindex"]').val();
                 socket.emit('joinGame',{
-                    gameid: gameid,
+                    gameindex: gameindex,
                     newplayer: nick
                 })
-                document.cookie = "gameid="+gameid;
+                document.cookie = "gameindex="+gameindex;
                 setTimeout(function(){window.location = "queue.html"},100)
             }
         }

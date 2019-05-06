@@ -242,6 +242,7 @@ function init(){
         tilesArray.push(new Tile((i%boardWidth)+1, column, undefined, undefined));
     }
 }
+init();
 
 //CANVAS
 $(function() {
@@ -433,6 +434,5 @@ $(function() {
             }
         }
     }
-    init();
     animate();
 });

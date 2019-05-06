@@ -1,35 +1,4 @@
 
-///FUNCTIONS
-
-function play(name, newdotsMax, points){
-    if(points!=0){
-        let thisp = playersArray[turn];
-        thisp.score+=points;
-        let pscore = thisp.score;
-        $('#score').html(pscore);
-        $('#p'+turn).html(thisp.name+': '+pscore);
-    }
-
-    dotsArray[dotsMax+newdotsMax-5].end = true;
-    // if(combo===false) dotsArray[dotsMax+newdotsMax-5].end = true;
-    // else dotsArray[dotsMax+newdotsMax-5].end = 'next';
-    dotsMax+=newdotsMax;
-    dotsArray.length = dotsMax-4;
-
-    let box = $('#pngbox');
-    box.html('<img class="ycbox" src="img/'+name+'.png">');
-    setTimeout(function(){
-        box.css({'z-index': '90', 'transform': 'translate(-50%, -50%) scale(1)'});
-        setTimeout(function(){
-            box.css('transform', 'translate(-50%, -50%) scale(0.05)');
-            setTimeout(function(){
-                box.html('');
-                box.css('z-index', '-1');
-            },100);
-        },1500);
-    },100);
-}
-
 //CANVAS
 $(function() {
     var c = document.querySelector('canvas');
@@ -40,6 +9,7 @@ $(function() {
         x: 150,
         y: 150
     };
+    var tilewidth = 8;
 
     $('#c').mousemove(function(e) {
         var rect = c.getBoundingClientRect();
@@ -47,24 +17,17 @@ $(function() {
         mouse.y = e.clientY - rect.top;
     });
 
-    $('#c').click(function(e) {
-        let w = 0;
-        let c = 0
-        if(mouse.y<=60) w = 1;
-        else if(mouse.y<=120) w = 2;
-        else if(mouse.y<=180) w = 3;
-        else if(mouse.y<=240) w = 4;
-        else w = 5;
-        if(mouse.x<=60) c = 1;
-        else if(mouse.x<=120) c = 2;
-        else if(mouse.x<=180) c = 3;
-        else if(mouse.x<=240) c = 4;
-        else c = 5;
+    $('#c').click(function() {
+        //MIESZAŁEŚ TU JAKBY CO
+        let y = Math.ceil((mouse.y)/tilewidth);
+        let x = Math.ceil((mouse.x)/tilewidth);
 
         if(dotsArray.length<dotsMax){
+            let dotwidth = 8;
             let color = playersArray[turn].c;
-            let tileId = (w-1)*board+c-1;
-            dotsArray.push(new Dot(tileId, false, (c*60)-34, (w*60)-34, 8, color));
+            let tileId = (y-1)*board+x-1;
+            dotsArray.push(new Dot(tileId, false, ((x*tilewidth)-(tilewidth/2)-(dotwidth/2)), 
+            ((y*tilewidth)-(tilewidth/2)-(dotwidth/2)), dotwidth, color));
 
             if(onz==true && dotsArray.length==dotsMax-1){
                 let id1 = dotsArray[dotsMax-4].tileId;

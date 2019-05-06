@@ -14,6 +14,9 @@ const colors = [red, blue, green, yellow, pink];
 const dcolors = [dred, dblue, dgreen, dyellow, dpink];
 //
 
+var canvwidth = 300;
+var dotwidth = 8;
+
 var PORT = process.env.PORT || 2000;
 const express = require('express');
 var app = require('express')();
@@ -29,13 +32,13 @@ serv.listen( PORT, function() {
 });
 
 var gamesArray = [];
-function Game(p, player1, b, onz, color, combo, cards){
+function Game(p, player1, b, onz, color4, combo, cards){
     this.status = "queue init";
 	this.pn = p;
 	this.playersArray = [player1];
     this.board = parseInt(b);
     this.onz = onz;
-    this.color = color;
+    this.color4 = color4;
     this.combo = combo;
     this.cards = cards;
 }
@@ -53,16 +56,24 @@ function Tile(x, y, player, letter){
     this.p = player;
     this.l = letter;
 }
-
-function startGame(gameid){
-    console.log('\x1b[0m%s%s\x1b[34m%s\x1b[0m', 'game with index: ', gameid, " started");
-    let g = gamesArray[gameid];
+function Dot(tileId, end, x, y, p, w){
+    this.tileId = tileId;
+    this.end = end;
+    this.x = x;
+    this.y = y;
+    this.p = p;
+    this.w = w;
+}
+function startGame(gameindex){
+    console.log('\x1b[0m%s%s\x1b[34m%s\x1b[0m', 'game with index: ', gameindex, " started");
+    let g = gamesArray[gameindex];
 
     g.status = "game init";
     g.endThisGame = false;
     g.whoStarts = 0;
     g.turn = 0;
     g.dotsMax = 4;
+    g.tilewidth = canvwidth/g.board;
     g.move;
     g.moves;
     //TO JUŻ JEST I TYLKO DODAJESZ KOLORY 
@@ -196,6 +207,25 @@ function startGame(gameid){
             if(g.moves==g.board*g.board || g.endThisGame==true) g.endGame();
         }
     }
+    g.play = function(name, newdotsMax, points){
+        if(points!=0 && name!="combo"){
+            g.playersArray[g.turn].score+=points;
+            // if(combo===false) dotsArray[dotsMax+newdotsMax-5].end = true;
+            // else dotsArray[dotsMax+newdotsMax-5].end = 'next';
+        }
+        g.dotsArray[g.dotsMax+newdotsMax-5].end = true;
+        g.dotsMax+=newdotsMax;
+        g.dotsArray.length = g.dotsMax-4;
+
+        for(var i in g.playersArray){
+            let socket = socketsList[g.playersArray[i].id];
+            socket.emit('newPlay', {
+                name: name,
+                newdotsMax: newdotsMax,
+                points: points
+            });
+        }
+    }
     g.endGame = function(){
         g.endThisGame = false;
         g.dotsArray.length = 0;
@@ -217,10 +247,11 @@ var socketsList = [];
 var io = require('socket.io')(serv);
 io.sockets.on('connection', function(socket){
 
-    //START
+    //CONNECTION
     socket.emit('serverMsg',{
         msg:'connect with server'
     });
+    //SETTIMEOUT JAK NIE DOSTANIESZ ID TO SAM EMIT ŻEBY DAŁ
     socket.on('passId',function(data){
         // if(connected==false){
             socket.myid = data.pcid;
@@ -230,11 +261,13 @@ io.sockets.on('connection', function(socket){
     })
     socket.on('disconnect', (reason) => {
         setTimeout(function(){
-            if(socketsList[socket.myid].connected==false){
-                if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
-                else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
-                // delete socketsList[socket.myid];
-                socket.removeAllListeners();
+            if(socketsList[socket.myid]){
+                if(socketsList[socket.myid].connected==false){
+                    if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
+                    else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
+                    delete socketsList[socket.myid];
+                    socket.removeAllListeners();
+                }
             }
             let found = false;
             let gameindex;
@@ -246,21 +279,23 @@ io.sockets.on('connection', function(socket){
                 if(gameindex>-1) found = true;
             }
             let g = gamesArray[gameindex];
-            if(found==true){
-                if(g.status=="queue" || g.status=="started"){
-                    for(var i in g.playersArray){
-                        if(g.playersArray[i].id!=socket.myid){
-                            let gamesocket = socketsList[g.playersArray[i].id];
-                            gamesocket.emit('closeGame');
-                        }
-                    }
-                    g.status = "closed";
-                    g.playersArray = [];
-                    console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
-                }
-                if(g.playersArray[0].id==socket.myid && g.status=="queue init") g.status = "queue";
-                if(g.status=="qame init") g.status = "started";
-            }
+            // if(found==true){
+            //     if(g.status=="queue" || g.status=="started"){
+            //         for(var i in g.playersArray){
+            //             if(g.playersArray[i].id!=socket.myid){
+            //                 let gamesocket = socketsList[g.playersArray[i].id];
+            //                 gamesocket.emit('closeGame');
+            //             }
+            //         }
+            //         g.status = "closed";
+            //         g.playersArray = [];
+            //         console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
+            //     }
+            //     if(g.playersArray[0]){
+            //         if(g.playersArray[0].id==socket.myid && g.status=="queue init") g.status = "queue";
+            //     }
+            //     if(g.status=="qame init") g.status = "started";
+            // }
         },3000);
     })
 
@@ -271,23 +306,25 @@ io.sockets.on('connection', function(socket){
             if(e.playersArray[0]) return e.playersArray[0].id; 
         }).indexOf(socket.myid);
         
-        socket.emit('getYoursGameId',{
+        socket.emit('getYoursGameIndex',{
 			gameindex: gameindex
 		});
         console.log('\x1b[0m%s%s\x1b[33m%s\x1b[0m', 'game with index: ', gameindex, " created");
 	});
 	socket.on('joinGame', function(data){
-        let g = gamesArray[data.gameid];
-		g.playersArray.push(new Player(socket.myid, data.newplayer, undefined, undefined, "O", 0));
-        console.log('\x1b[0m%s%s\x1b[32m%s\x1b[0m', 'game with index: ', data.gameid, " has new player");
-        for(var i in g.playersArray){
-            let socket = socketsList[g.playersArray[i].id];
-            socket.emit('newPlayerInYourGame',{
-                gameid: data.gameid,
-                newplayer: data.newplayer
-            });
+        let g = gamesArray[data.gameindex];
+        if(g.playerArray!=[]){
+            g.playersArray.push(new Player(socket.myid, data.newplayer, undefined, undefined, "O", 0));
+            console.log('\x1b[0m%s%s\x1b[32m%s\x1b[0m', 'game with index: ', data.gameindex, " has new player");
+            for(var i in g.playersArray){
+                let socket = socketsList[g.playersArray[i].id];
+                socket.emit('newPlayerInYourGame',{
+                    gameindex: data.gameindex,
+                    newplayer: data.newplayer
+                });
+            }
+            if(g.playersArray.length==g.pn) startGame(data.gameindex);
         }
-        if(g.playersArray.length==g.pn) startGame(data.gameid);
 	});
 	socket.on('showGames', function(data){
         if(data.all == true){
@@ -302,14 +339,155 @@ io.sockets.on('connection', function(socket){
     });
     socket.on('setLet', function(data){
         //UWAGA NA CHEATERÓW / DODAJ SE TU JESZCZE PLAYERID
-        gamesArray[data.gameid].playersArray[data.pindex].al = data.letter;
+        gamesArray[data.gameindex].playersArray[data.pindex].al = data.letter;
     });
     socket.on('writeLet', function(data){
         //UWAGA NA CHEATERÓW
-        gamesArray[data.gameid].writeLet(data.pindex, data.x, data.y);
+        gamesArray[data.gameindex].writeLet(data.pindex, data.x, data.y);
     });
     socket.on('nextTurn', function(data){
         //UWAGA NA CHEATERÓW
-        gamesArray[data.gameid].nextTurn(data.pindex);
+        gamesArray[data.gameindex].nextTurn(data.pindex);
+    });
+    socket.on('writeDot', function(data){
+        //UWAGA NA CHEATERÓW
+        let g = gamesArray[data.gameindex]
+
+        if(g.turn==data.pindex){
+            let x = data.x;
+            let y = data.y;
+            if(g.dotsArray.length<g.dotsMax){
+                let tileId = (y-1)*g.board+x-1;
+                let correction = (g.tilewidth/2)+(dotwidth/2)
+                let canvx = (x*g.tilewidth)-correction;
+                let canvy = (y*g.tilewidth)-correction;
+                g.dotsArray.push(new Dot(tileId, false, canvx, canvy, g.turn, dotwidth));
+                //EMIT
+                for(var i in g.playersArray){
+                    let socket = socketsList[g.playersArray[i].id];
+                    socket.emit('newDot', {
+                        end: false,
+                        x: canvx,
+                        y: canvy,
+                        c: g.playersArray[g.turn].c,
+                        w: dotwidth
+                    });
+                }
+
+                let l = g.linesArray;
+                if(g.onz==true && g.dotsArray.length==g.dotsMax-1){
+                    let id1 = g.dotsArray[g.dotsMax-4].tileId;
+                    let id2 = g.dotsArray[g.dotsMax-3].tileId;
+                    let id3 = g.dotsArray[g.dotsMax-2].tileId;
+                    //DOUBLE LINE BLOCK
+                    let lineBlock = false;
+                    for(i=0; i<l.length; i++){
+                        for(j=0; j<3; j++){
+                            if(id1==l[i][j%3] && id2==l[i][(j+1)%3] && id3==l[i][(j+2)%3]) lineBlock = true;
+                        }
+                    }
+                    if(lineBlock==false){
+                        let t1 = g.tilesArray[id1];
+                        let t2 = g.tilesArray[id2];
+                        let t3 = g.tilesArray[id3];
+                        let xdistance = t1.c-t2.c;
+                        let ydistance = t1.w-t2.w;
+                        //3 W LINII CHECK
+                        if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
+                        t2.c-xdistance==t3.c &&t2.w-ydistance==t3.w){
+                            //ONZ CHECK
+                            if(t1.l=="O" && t2.l=="N" && t3.l=="Z"){
+                                console.log("ONZ");
+                                g.linesArray.push([id1,id2,id3]);
+                                play("onz", 3, 1);
+                            }
+                        }
+                    }
+                } else if(g.dotsArray.length==g.dotsMax){
+                    let id1 = g.dotsArray[g.dotsMax-4].tileId;
+                    let id2 = g.dotsArray[g.dotsMax-3].tileId;
+                    let id3 = g.dotsArray[g.dotsMax-2].tileId;
+                    let id4 = g.dotsArray[g.dotsMax-1].tileId;
+                    let t1 = g.tilesArray[id1];
+                    let t2 = g.tilesArray[id2];
+                    let t3 = g.tilesArray[id3];
+                    let t4 = g.tilesArray[id4];
+                    let xdistance = t1.c-t2.c;
+                    let ydistance = t1.w-t2.w;
+                    //DLA COMBA
+                    let xdistance2 = t2.c-t3.c;
+                    let ydistance2 = t2.w-t3.w;
+                    //4 W LINII CHECK
+                    if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
+                    t2.c-xdistance==t3.c && t2.w-ydistance==t3.w && t3.c-xdistance==t4.c && 
+                    t3.w-ydistance==t4.w && (xdistance!=0 || ydistance !=0)){
+                        let doubleDotsBlock = 4;
+                        //DOUBLE LINE BLOCK
+                        let lineBlock = false;
+                        for(i=0; i<l.length; i++){
+                            if((id1==l[i][0] && id2==l[i][1] && id3==l[i][2] && id4==l[i][3]) ||
+                            (id1==l[i][3] && id2==l[i][2] && id3==l[i][1] && id4==l[i][0])) lineBlock = true;
+                        }
+                        if(lineBlock==false){
+                            //OZNS CHECK
+                            if(t1.l=="O" && t2.l=="Z" && t3.l=="N" && t4.l=="S"){
+                                console.log("OZNS");
+                                g.linesArray.push([id1,id2,id3,id4]);
+                                doubleDotsBlock = 0;
+                                g.endThisGame = true;
+                                let pletters = 1;
+                                if(g.turn==t1.p) pletters++;
+                                if(g.turn==t2.p) pletters++;
+                                if(g.turn==t3.p) pletters++;
+                                if(g.turn==t4.p) pletters++;
+                                play("ozns", 4, pletters);
+                            }
+                            //KOLOR CHECK
+                            if(g.color4==true && t1.p!==undefined && t2.p==t1.p && t3.p==t1.p && t4.p==t1.p){
+                                console.log("COLOR");
+                                g.linesArray.push([id1,id2,id3,id4]);
+                                play("color", doubleDotsBlock, 1);
+                            }
+                        }
+                    }//COMBO CHECK
+                    else if(g.combo==true && xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
+                    xdistance2>=-1 && xdistance2<=1 && ydistance2 >=-1 && ydistance2<=1 &&
+                    t1.c-xdistance2==t4.c && t1.w-ydistance2==t4.w){
+                        //DOUBLE LINE BLOCK
+                        let lineBlock = false;
+                        for(i=0; i<l.length; i++){
+                            for(j=0; j<4; j++){
+                                if((id1==l[i][j%4] && id2==l[i][(j+1)%4] && id3==l[i][(j+2)%4] && id4==l[i][(j+3)%4]) ||
+                                (id1==l[i][(j+3)%4] && id2==l[i][(j+2)%4] && id3==l[i][(j+1)%4] && id4==l[i][j%4])) lineBlock = true;
+                            }
+                        }
+                        if(lineBlock==false){
+                            let cbcheck = 0;
+                            let comlet = 0;
+                            for(i=4; i>0; i--){
+                                comlet = g.tilesArray[dotsArray[dotsMax-i].tileId].l;
+                                if(comlet=="S") cbcheck = cbcheck+1;
+                                else if(comlet=="N") cbcheck = cbcheck+10;
+                                else if(comlet=="Z") cbcheck = cbcheck+100;
+                                else if(comlet=="O") cbcheck = cbcheck+1000;
+                            }
+                            if(cbcheck==1111){
+                                console.log("COMBO");
+                                g.linesArray.push([id1,id2,id3,id4]);
+                                g.move--;
+                                play("combo", 4, 0);
+                                $('#turn').css('background-color', background);
+                            }
+                        }
+                    }
+                }
+            } else {
+                g.dotsArray.length = g.dotsMax-4;
+                for(var i in g.playersArray){
+                    let socket = socketsList[g.playersArray[i].id];
+                    socket.emit('breakDots');
+                }
+            }
+        }
     });
 });

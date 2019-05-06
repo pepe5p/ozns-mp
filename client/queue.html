@@ -23,12 +23,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 	<script src="socketiopack.js"></script>
     <script>
-        var gameid = getCookie("gameid");
-        if (gameid == null) window.location = "homepage.html";
+        var gameindex = getCookie("gameindex");
+        if (gameindex == null) window.location = "homepage.html";
 
         socket.emit('showGames',{
             all: false,
-            index: gameid
+            index: gameindex
         });
         var pn;
         var playersLen;
@@ -60,7 +60,7 @@
             +'<br>ZASADY:'+rules+"</div>");
         });
         socket.on('newPlayerInYourGame', function(data){
-            if(data.gameid == gameid){
+            if(data.gameindex == gameindex){
                 playersLen++;
                 if(playersLen == pn) window.location = "game.html";
                 $('.pn').html(playersLen);
