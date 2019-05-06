@@ -209,7 +209,7 @@ $(function() {
                     let x2 = g.dotsArray[i+1].x+5;
                     let y2 = g.dotsArray[i+1].y+5;
                     
-                    if((dots[i].p == g.dotsArray[i+1].p)&&(dots[i].end !== true)){
+                    if((g.dotsArray[i].p == g.dotsArray[i+1].p)&&(g.dotsArray[i].end !== true)){
                         ctx.beginPath();
                         let color = g.dotsArray[i].color;
                         ctx.strokeStyle = color;
