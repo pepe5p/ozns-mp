@@ -172,7 +172,7 @@ $(function() {
             thisp.score+=points;
             let pscore = thisp.score;
             if(g.turn==pindex) $('#score').html(pscore);
-            $('#p'+turn).html(pscore);
+            $('#p'+g.turn).html(pscore);
         }
         if(name!="yourturn"){
             dots[g.dotsMax+newdotsMax-5].end = true;

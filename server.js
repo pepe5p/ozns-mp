@@ -465,7 +465,7 @@ io.sockets.on('connection', function(socket){
                             let cbcheck = 0;
                             let comlet = 0;
                             for(i=4; i>0; i--){
-                                comlet = g.tilesArray[dotsArray[dotsMax-i].tileId].l;
+                                comlet = g.tilesArray[g.dotsArray[g.dotsMax-i].tileId].l;
                                 if(comlet=="S") cbcheck = cbcheck+1;
                                 else if(comlet=="N") cbcheck = cbcheck+10;
                                 else if(comlet=="Z") cbcheck = cbcheck+100;
