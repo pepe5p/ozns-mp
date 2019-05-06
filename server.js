@@ -399,7 +399,7 @@ io.sockets.on('connection', function(socket){
                             if(t1.l=="O" && t2.l=="N" && t3.l=="Z"){
                                 console.log("ONZ");
                                 g.linesArray.push([id1,id2,id3]);
-                                play("onz", 3, 1);
+                                g.play("onz", 3, 1);
                             }
                         }
                     }
@@ -440,13 +440,13 @@ io.sockets.on('connection', function(socket){
                                 if(g.turn==t2.p) pletters++;
                                 if(g.turn==t3.p) pletters++;
                                 if(g.turn==t4.p) pletters++;
-                                play("ozns", 4, pletters);
+                                g.play("ozns", 4, pletters);
                             }
                             //KOLOR CHECK
                             if(g.color4==true && t1.p!==undefined && t2.p==t1.p && t3.p==t1.p && t4.p==t1.p){
                                 console.log("COLOR");
                                 g.linesArray.push([id1,id2,id3,id4]);
-                                play("color", doubleDotsBlock, 1);
+                                g.play("color", doubleDotsBlock, 1);
                             }
                         }
                     }//COMBO CHECK
@@ -475,7 +475,7 @@ io.sockets.on('connection', function(socket){
                                 console.log("COMBO");
                                 g.linesArray.push([id1,id2,id3,id4]);
                                 g.move--;
-                                play("combo", 4, 0);
+                                g.play("combo", 4, 0);
                                 for(var i in g.playersArray){
                                     let socket = socketsList[g.playersArray[i].id];
                                     socket.emit('combo');
