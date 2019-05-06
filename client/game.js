@@ -11,7 +11,6 @@ $(function() {
     if (gameindex == null) window.location = "homepage.html";
     var g;
     var tilewidth;
-    var dots;
 
     var canvas = false;
     var c = document.querySelector('canvas');
@@ -31,7 +30,6 @@ $(function() {
     socket.on('getGames', function(data){
         g = data.msg;
         tilewidth = c.width/g.board;
-        dots = g.dotsArray;
         let players = g.playersArray;
         let board = g.board;
 
@@ -109,7 +107,7 @@ $(function() {
         $('#turn').css('background-color', background);
     });
     socket.on('endGame', function(data){
-        dots.length = 0;
+        g.dotsArray.length = 0;
         g.turn = data.turn;
         $("#board > .flexbox").children(".tile").empty();
     });
@@ -178,11 +176,11 @@ $(function() {
             $('#p'+g.turn).html(pscore);
         }
         if(name!="yourturn"){
-            dots[g.dotsMax+newdotsMax-5].end = true;
-            // if(combo===false) dotsArray[dotsMax+newdotsMax-5].end = true;
-            // else dotsArray[dotsMax+newdotsMax-5].end = 'next';
+            g.dotsArray[g.dotsMax+newdotsMax-5].end = true;
+            // if(combo===false) g.dotsArrayArray[dotsMax+newdotsMax-5].end = true;
+            // else g.dotsArrayArray[dotsMax+newdotsMax-5].end = 'next';
             g.dotsMax+=newdotsMax;
-            dots.length = g.dotsMax-4;
+            g.dotsArray.length = g.dotsMax-4;
         }
     }
     function Dot(end, x, y, c, w){
@@ -203,17 +201,17 @@ $(function() {
         requestAnimationFrame(animate);
         if(gameGot==true){
             ctx.clearRect(0, 0, c.width, c.height);
-            for(var i = 0; i < dots.length; i++){
-                dots[i].update();
-                if(typeof dots[i+1] !== 'undefined'){
-                    let x1 = dots[i].x+5;
-                    let y1 = dots[i].y+5;
-                    let x2 = dots[i+1].x+5;
-                    let y2 = dots[i+1].y+5;
+            for(var i = 0; i < g.dotsArray.length; i++){
+                g.dotsArray[i].update();
+                if(typeof g.dotsArray[i+1] !== 'undefined'){
+                    let x1 = g.dotsArray[i].x+5;
+                    let y1 = g.dotsArray[i].y+5;
+                    let x2 = g.dotsArray[i+1].x+5;
+                    let y2 = g.dotsArray[i+1].y+5;
                     
-                    if((dots[i].p == dots[i+1].p)&&(dots[i].end !== true)){
+                    if((dots[i].p == g.dotsArray[i+1].p)&&(dots[i].end !== true)){
                         ctx.beginPath();
-                        let color = dots[i].color;
+                        let color = g.dotsArray[i].color;
                         ctx.strokeStyle = color;
                         ctx.lineWidth = 4;
                         ctx.moveTo(x1-2, y1-2);
