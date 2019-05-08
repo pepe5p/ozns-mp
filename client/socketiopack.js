@@ -7,9 +7,11 @@ if (pcid == null) {
     document.cookie = "pcid="+Math.random();
     var pcid = getCookie("pcid");
 }
-socket.emit('passId',{
-    pcid: pcid
-})
+function passId(){
+    socket.emit('passId',{
+        pcid: pcid
+    })
+}
 function getCookie(cname) {
     var name = cname + "=";
     var decodedCookie = decodeURIComponent(document.cookie);
@@ -25,3 +27,4 @@ function getCookie(cname) {
     }
     return null;
 }
+passId();

@@ -25,13 +25,13 @@
     <script>
         var gameindex = getCookie("gameindex");
         if (gameindex == null) window.location = "homepage.html";
+        var pn;
+        var playersLen;
 
         socket.emit('showGames',{
             all: false,
             index: gameindex
         });
-        var pn;
-        var playersLen;
         socket.on('getGames', function(data){
             let game = data.msg;
             pn = game.pn;
@@ -46,8 +46,8 @@
             let board = game.board;
             let onz = game.onz;
             if(onz==true) rules+=" onz";
-            let color = game.color;
-            if(color==true) rules+=" color";
+            let color4 = game.color4;
+            if(color4==true) rules+=" color";
             let combo = game.combo;
             if(combo==true) rules+=" combo";
             let cards = game.cards;
@@ -62,11 +62,14 @@
         socket.on('newPlayerInYourGame', function(data){
             if(data.gameindex == gameindex){
                 playersLen++;
-                if(playersLen == pn) window.location = "game.html";
                 $('.pn').html(playersLen);
-                $('.players').append("<br>GRACZ "+playersLen+": "+data.newPlayer);
+                $('.players').append("<br>GRACZ "+playersLen+": "+data.newplayer);
             }
         });
+        socket.on('startGame', function(){
+            window.location = "game.html";
+        });
+        socket.on('showMeYourId',function(){passId();});
     </script>
 </body>
 </html>

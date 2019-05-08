@@ -33,7 +33,7 @@ serv.listen( PORT, function() {
 
 var gamesArray = [];
 function Game(p, player1, b, onz, color4, combo, cards){
-    this.status = "queue init";
+    this.status = "queue";
 	this.pn = p;
 	this.playersArray = [player1];
     this.board = parseInt(b);
@@ -68,7 +68,7 @@ function startGame(gameindex){
     console.log('\x1b[0m%s%s\x1b[34m%s\x1b[0m', 'game with index: ', gameindex, " started");
     let g = gamesArray[gameindex];
 
-    g.status = "game init";
+    g.status = "started";
     g.endThisGame = false;
     g.whoStarts = 0;
     g.turn = 0;
@@ -186,25 +186,25 @@ function startGame(gameindex){
     }
     g.nextTurn = function(pindex){
         if(pindex==g.turn && g.move==1){
+            if(g.endThisGame==false){
+                let nturn;
+                if(g.turn+1==g.pn) g.turn = 0;
+                else g.turn++;
+                if(g.turn+1==g.pn) nturn = 0;
+                else nturn = g.turn+1;
+                
+                g.dotsArray.length = g.dotsMax-4;
+                g.move = 0;
 
-            let nturn;
-            if(g.turn+1==g.pn) g.turn = 0;
-            else g.turn++;
-            if(g.turn+1==g.pn) nturn = 0;
-            else nturn = g.turn+1;
-            
-            g.dotsArray.length = g.dotsMax-4;
-            g.move = 0;
-
-            for(var i in g.playersArray){
-                let socket = socketsList[g.playersArray[i].id];
-                socket.emit('changeTurn',{
-                    aturn: g.turn,
-                    nturn: nturn
-                });
-            }
-
-            if(g.moves==g.board*g.board || g.endThisGame==true) g.endGame();
+                for(var i in g.playersArray){
+                    let socket = socketsList[g.playersArray[i].id];
+                    socket.emit('changeTurn',{
+                        aturn: g.turn,
+                        nturn: nturn
+                    });
+                }
+                if(g.moves==g.board*g.board) g.endGame();
+            } else g.endgame();
         }
     }
     g.play = function(name, newdotsMax, points){
@@ -233,71 +233,89 @@ function startGame(gameindex){
         g.dotsMax = 4;
         g.whoStarts = (g.whoStarts+1)%g.pn;
         g.turn = g.whoStarts;
+        let nturn;
+        if(g.turn+1==g.pn) nturn = 0;
+        else nturn = g.turn+1;
+
         for(var i in g.playersArray){
             let socket = socketsList[g.playersArray[i].id];
-            socket.emit('endGame', {
-                turn: g.turn
+            socket.emit('endGame');
+            socket.emit('changeTurn',{
+                aturn: g.turn,
+                nturn: nturn
             });
         }
         g.init();
     }
-
     g.init();
 }
 
 var socketsList = [];
 var io = require('socket.io')(serv);
-io.sockets.on('connection', function(socket){
+io.sockets.on('connect', function(socket){
+
+    //ŻEBY WIEDZIEĆ CZY KTOŚ WYCHODZI Z GRY
+    socket.inGame = false;
+    //ŻEBY MIEĆ ZAWSZE ID
+    socket.idPassed = false;
+    setTimeout(function(){
+        if(socket.idPassed==false) socket.emit("showMeYourId");
+    },200);
 
     //CONNECTION
     socket.emit('serverMsg',{
         msg:'connect with server'
     });
-    //SETTIMEOUT JAK NIE DOSTANIESZ ID TO SAM EMIT ŻEBY DAŁ
     socket.on('passId',function(data){
-        // if(connected==false){
-            socket.myid = data.pcid;
+        socket.idPassed = true;
+        socket.myid = data.pcid;
+        if(socketsList[socket.myid]==undefined){
             socketsList[socket.myid] = socket;
+            socketsList[socket.myid].even = 1;
             console.log('\x1b[0m%s\x1b[36m%s\x1b[0m', "socket connection id: ", socket.myid);
-        // }
+        } else {
+            socketsList[socket.myid].even*=-1;
+        }
     })
     socket.on('disconnect', (reason) => {
-        setTimeout(function(){
+        let oldInGame = socket.inGame;
+        // console.log('\x1b[34m%s\x1b[0m', oldInGame);
+        let found = false;
+        let gameindex;
+        let even = socketsList[socket.myid].even;
+        for(i=0; (found==false && i<100); i++){
+            gameindex = gamesArray.map(function(e) {
+                if(e.playersArray[i]) return e.playersArray[i].id;
+                else return -1;
+            }).indexOf(socket.myid);
+            if(gameindex>-1) found = true;
+        }
+        setTimeout(()=>{
+            let nowInGame;
+            let g = gamesArray[gameindex];
             if(socketsList[socket.myid]){
-                if(socketsList[socket.myid].connected==false){
+                nowInGame = socketsList[socket.myid].inGame;
+                // console.log('\x1b[32m%s\x1b[0m', nowInGame);
+                if(socketsList[socket.myid].even==even){
                     if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
                     else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
+                    socketsList[socket.myid].removeAllListeners();
                     delete socketsList[socket.myid];
-                    socket.removeAllListeners();
+                }
+            } else nowInGame==false;
+            if(g){
+                if(oldInGame==true && nowInGame==false){
+                    for(var i in g.playersArray){
+                        if(g.playersArray[i].id!=socket.myid){
+                            let gamesocket = socketsList[g.playersArray[i].id];
+                            gamesocket.emit('closeGame');
+                        }
+                    }
+                    g.status = "closed";
+                    g.playersArray = [];
+                    console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
                 }
             }
-            let found = false;
-            let gameindex;
-            for(i=0; (found==false && i<100); i++){
-                gameindex = gamesArray.map(function(e) {
-                    if(e.playersArray[i]) return e.playersArray[i].id;
-                    else return -1;
-                }).indexOf(socket.myid);
-                if(gameindex>-1) found = true;
-            }
-            let g = gamesArray[gameindex];
-            // if(found==true){
-            //     if(g.status=="queue" || g.status=="started"){
-            //         for(var i in g.playersArray){
-            //             if(g.playersArray[i].id!=socket.myid){
-            //                 let gamesocket = socketsList[g.playersArray[i].id];
-            //                 gamesocket.emit('closeGame');
-            //             }
-            //         }
-            //         g.status = "closed";
-            //         g.playersArray = [];
-            //         console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
-            //     }
-            //     if(g.playersArray[0]){
-            //         if(g.playersArray[0].id==socket.myid && g.status=="queue init") g.status = "queue";
-            //     }
-            //     if(g.status=="qame init") g.status = "started";
-            // }
         },3000);
     })
 
@@ -315,7 +333,7 @@ io.sockets.on('connection', function(socket){
 	});
 	socket.on('joinGame', function(data){
         let g = gamesArray[data.gameindex];
-        if(g.playerArray!=[]){
+        if(g.status!="closed"){
             g.playersArray.push(new Player(socket.myid, data.newplayer, undefined, undefined, "O", 0));
             console.log('\x1b[0m%s%s\x1b[32m%s\x1b[0m', 'game with index: ', data.gameindex, " has new player");
             for(var i in g.playersArray){
@@ -325,7 +343,13 @@ io.sockets.on('connection', function(socket){
                     newplayer: data.newplayer
                 });
             }
-            if(g.playersArray.length==g.pn) startGame(data.gameindex);
+            if(g.playersArray.length==g.pn){
+                for(var i in g.playersArray){
+                    let socket = socketsList[g.playersArray[i].id];
+                    socket.emit('startGame');
+                }
+                startGame(data.gameindex);
+            }
         }
 	});
 	socket.on('showGames', function(data){
@@ -334,6 +358,7 @@ io.sockets.on('connection', function(socket){
                 msg: gamesArray
             });
         } else {
+            socket.inGame = true;
             socket.emit('getGames',{
                 msg: gamesArray[data.index]
             });

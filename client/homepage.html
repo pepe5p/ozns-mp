@@ -125,7 +125,6 @@
         function rotate(x, z, angle){ 
             $('.rotatebox').css('transform','translate3d('+x+',0,'+z+') rotateY('+angle+'deg)'); 
         }
-
         function submitForm(){
             let nick = $('input[name="nick"]').val();
             let players = $('input[name="players"]').val();
@@ -154,7 +153,7 @@
             document.cookie = "gameindex="+data.gameindex;
             setTimeout(function(){window.location = "queue.html"},100)
         })
-
+        socket.on('showMeYourId',function(){passId();});
     </script>
 </body>
 </html>

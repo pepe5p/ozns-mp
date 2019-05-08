@@ -2,11 +2,11 @@
 I MUST HAVE
 C. poczeklania, rozpoczynanie gry
 C. stawianie liter
-C. skreślanie :2-3h
+C. skreślanie
 1. wychodzenie z poczeklani i gry musi kończyć gre i wyrzucać wszystkich do głównej :1-2h
 2. zabezpieczenie przed wysypywaniem serwera np if(var) jeśli może nie istnieć :30min
-2. zabezpieczenie przed cheaterami :30min
-. szerokość planszy :2h
+3. zabezpieczenie przed cheaterami :30min
+2. szerokość planszy :2h
 . ogarnięcie socket.io i naprawa zdupconego kodu połączeń którego nie ogarniasz :1-8h
 PS: zobacz sobie raining chain i skopiuj na sam początek
 
@@ -20,6 +20,7 @@ II POTRZEBNE
 
 III WARTO DODAĆ
 . czat w grze :1-2h
+. tryb widza :1-2h
 . przeniesienie wszystkiego do canvas :2-3h
 . najlepsze zagrania :2-3h
 . tabela wyników :1h
@@ -29,4 +30,4 @@ IV PIERDOŁY ALE CIESZĄ
 . optymalizacja rotacji w głównej i wczytywania obrazków :30min-3h
 . animacje i płynne przejścia :2-3h
 . lepsze ostylowanie w css :2-4h
-. socket connect tylko jeśli była przerwa conajmniej 3s w połączeniu :30min-1h
+C. socket connect tylko jeśli była przerwa conajmniej 3s w połączeniu

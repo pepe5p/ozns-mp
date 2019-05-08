@@ -56,8 +56,8 @@
                     let board = g.board;
                     let onz = g.onz;
                     if(onz==true) rules+=" onz";
-                    let color = g.color;
-                    if(color==true) rules+=" color";
+                    let color4 = g.color4;
+                    if(color4==true) rules+=" color";
                     let combo = g.combo;
                     if(combo==true) rules+=" combo";
                     let cards = g.cards;
@@ -76,6 +76,7 @@
         socket.on('closeGame', function(){
             window.location = "homepage.html";
         });
+        socket.on('showMeYourId',function(){passId();});
 
         var gbox = $('.makegrey');
         var pnick = $('.put_nick');
