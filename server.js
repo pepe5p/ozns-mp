@@ -316,7 +316,7 @@ io.sockets.on('connect', function(socket){
                     console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
                 }
             }
-        },3000);
+        },500);
     })
 
     //GAMES
