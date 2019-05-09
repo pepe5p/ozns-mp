@@ -115,6 +115,7 @@ $(function() {
         window.location = "homepage.html";
     });
     socket.on('showMeYourId',function(){passId();})
+    socket.on('ping',function(){socket.emit('pong');});
 
     //FUNCTIONS
     function showcanv(){

@@ -226,6 +226,146 @@ function startGame(gameindex){
             });
         }
     }
+    g.writeDot = function(pindex, gameindex, x ,y){
+        let g = gamesArray[gameindex];
+        if(g.turn==pindex){
+            if(g.dotsArray.length<g.dotsMax){
+                let tileId = (y-1)*g.board+x-1;
+                let correction = (g.tilewidth/2)+(dotwidth/2)
+                let canvx = (x*g.tilewidth)-correction;
+                let canvy = (y*g.tilewidth)-correction;
+                g.dotsArray.push(new Dot(tileId, false, canvx, canvy, g.turn, dotwidth));
+                //EMIT
+                for(var i in g.playersArray){
+                    let socket = socketsList[g.playersArray[i].id];
+                    socket.emit('newDot', {
+                        end: false,
+                        x: canvx,
+                        y: canvy,
+                        c: g.playersArray[g.turn].c,
+                        w: dotwidth
+                    });
+                }
+
+                let l = g.linesArray;
+                if(g.onz==true && g.dotsArray.length==g.dotsMax-1){
+                    let id1 = g.dotsArray[g.dotsMax-4].tileId;
+                    let id2 = g.dotsArray[g.dotsMax-3].tileId;
+                    let id3 = g.dotsArray[g.dotsMax-2].tileId;
+                    //DOUBLE LINE BLOCK
+                    let lineBlock = false;
+                    for(i=0; i<l.length; i++){
+                        for(j=0; j<3; j++){
+                            if(id1==l[i][j%3] && id2==l[i][(j+1)%3] && id3==l[i][(j+2)%3]) lineBlock = true;
+                        }
+                    }
+                    if(lineBlock==false){
+                        let t1 = g.tilesArray[id1];
+                        let t2 = g.tilesArray[id2];
+                        let t3 = g.tilesArray[id3];
+                        let xdistance = t1.x-t2.x;
+                        let ydistance = t1.y-t2.y;
+                        //3 W LINII CHECK
+                        if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
+                        t2.x-xdistance==t3.x &&t2.y-ydistance==t3.y){
+                            //ONZ CHECK
+                            if(t1.l=="O" && t2.l=="N" && t3.l=="Z"){
+                                console.log("game with id: "+gameindex+" -> ONZ");
+                                g.linesArray.push([id1,id2,id3]);
+                                g.play("onz", 3, 1);
+                            }
+                        }
+                    }
+                } else if(g.dotsArray.length==g.dotsMax){
+                    let id1 = g.dotsArray[g.dotsMax-4].tileId;
+                    let id2 = g.dotsArray[g.dotsMax-3].tileId;
+                    let id3 = g.dotsArray[g.dotsMax-2].tileId;
+                    let id4 = g.dotsArray[g.dotsMax-1].tileId;
+                    let t1 = g.tilesArray[id1];
+                    let t2 = g.tilesArray[id2];
+                    let t3 = g.tilesArray[id3];
+                    let t4 = g.tilesArray[id4];
+                    let xdistance = t1.x-t2.x;
+                    let ydistance = t1.y-t2.y;
+                    //DLA COMBA
+                    let xdistance2 = t2.x-t3.x;
+                    let ydistance2 = t2.y-t3.y;
+                    //4 W LINII CHECK
+                    if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
+                    t2.x-xdistance==t3.x && t2.y-ydistance==t3.y && t3.x-xdistance==t4.x && 
+                    t3.y-ydistance==t4.y && (xdistance!=0 || ydistance !=0)){
+                        let doubleDotsBlock = 4;
+                        //DOUBLE LINE BLOCK
+                        let lineBlock = false;
+                        for(i=0; i<l.length; i++){
+                            if((id1==l[i][0] && id2==l[i][1] && id3==l[i][2] && id4==l[i][3]) ||
+                            (id1==l[i][3] && id2==l[i][2] && id3==l[i][1] && id4==l[i][0])) lineBlock = true;
+                        }
+                        if(lineBlock==false){
+                            //OZNS CHECK
+                            if(t1.l=="O" && t2.l=="Z" && t3.l=="N" && t4.l=="S"){
+                                console.log("game with id: "+gameindex+" -> OZNS");
+                                g.linesArray.push([id1,id2,id3,id4]);
+                                doubleDotsBlock = 0;
+                                g.endThisGame = true;
+                                let pletters = 1;
+                                if(g.turn==t1.p) pletters++;
+                                if(g.turn==t2.p) pletters++;
+                                if(g.turn==t3.p) pletters++;
+                                if(g.turn==t4.p) pletters++;
+                                g.play("ozns", 4, pletters);
+                            }
+                            //KOLOR CHECK
+                            if(g.color4==true && t1.p!==undefined && t2.p==t1.p && t3.p==t1.p && t4.p==t1.p){
+                                console.log("game with id: "+gameindex+" -> COLOR");
+                                g.linesArray.push([id1,id2,id3,id4]);
+                                g.play("color", doubleDotsBlock, 1);
+                            }
+                        }
+                    }//COMBO CHECK
+                    else if(g.combo==true && xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
+                    xdistance2>=-1 && xdistance2<=1 && ydistance2 >=-1 && ydistance2<=1 &&
+                    t1.x-xdistance2==t4.x && t1.y-ydistance2==t4.y){
+                        //DOUBLE LINE BLOCK
+                        let lineBlock = false;
+                        for(i=0; i<l.length; i++){
+                            for(j=0; j<4; j++){
+                                if((id1==l[i][j%4] && id2==l[i][(j+1)%4] && id3==l[i][(j+2)%4] && id4==l[i][(j+3)%4]) ||
+                                (id1==l[i][(j+3)%4] && id2==l[i][(j+2)%4] && id3==l[i][(j+1)%4] && id4==l[i][j%4])) lineBlock = true;
+                            }
+                        }
+                        if(lineBlock==false){
+                            let cbcheck = 0;
+                            let comlet = 0;
+                            for(i=4; i>0; i--){
+                                comlet = g.tilesArray[g.dotsArray[g.dotsMax-i].tileId].l;
+                                if(comlet=="S") cbcheck = cbcheck+1;
+                                else if(comlet=="N") cbcheck = cbcheck+10;
+                                else if(comlet=="Z") cbcheck = cbcheck+100;
+                                else if(comlet=="O") cbcheck = cbcheck+1000;
+                            }
+                            if(cbcheck==1111){
+                                console.log("game with id: "+gameindex+" -> COMBO");
+                                g.linesArray.push([id1,id2,id3,id4]);
+                                g.move--;
+                                g.play("combo", 4, 0);
+                                for(var i in g.playersArray){
+                                    let socket = socketsList[g.playersArray[i].id];
+                                    socket.emit('combo');
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                g.dotsArray.length = g.dotsMax-4;
+                for(var i in g.playersArray){
+                    let socket = socketsList[g.playersArray[i].id];
+                    socket.emit('breakDots');
+                }
+            }
+        }
+    }
     g.endGame = function(){
         g.endThisGame = false;
         g.dotsArray.length = 0;
@@ -251,8 +391,9 @@ function startGame(gameindex){
 
 var socketsList = [];
 var io = require('socket.io')(serv);
-io.sockets.on('connection', function(socket){
+io.sockets.on('connect', function(socket){
 
+    socket.ping = false;
     socket.inGame = false;
     socket.idPassed = false;
     setTimeout(function(){
@@ -285,19 +426,23 @@ io.sockets.on('connection', function(socket){
             let g = gamesArray[gameindex];
             if(socketsList[socket.myid]){
                 nowInGame = socketsList[socket.myid].inGame;
-                if(socketsList[socket.myid].idPassed==false){
-                    if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
-                    else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
-                    socketsList[socket.myid].removeAllListeners();
-                    delete socketsList[socket.myid];
-                }
+                socketsList[socket.myid].emit("ping");
+                setTimeout(()=>{
+                    console.log(socketsList[socket.myid].ping);
+                    if(socketsList[socket.myid].ping==true){
+                        if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
+                        else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
+                        socketsList[socket.myid].removeAllListeners();
+                        delete socketsList[socket.myid];
+                    }
+                },500);
             } else nowInGame==false;
             if(g){
                 if(oldInGame==true && nowInGame==false){
                     for(var i in g.playersArray){
                         if(g.playersArray[i].id!=socket.myid){
-                            let gamesocket = socketsList[g.playersArray[i].id];
-                            gamesocket.emit('closeGame');
+                            let socket = socketsList[g.playersArray[i].id];
+                            socket.emit('closeGame');
                         }
                     }
                     g.status = "closed";
@@ -305,7 +450,7 @@ io.sockets.on('connection', function(socket){
                     console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
                 }
             }
-        }, 1000);
+        },500);
     })
 
     //GAMES
@@ -355,158 +500,35 @@ io.sockets.on('connection', function(socket){
     });
     socket.on('setLet', function(data){
         //UWAGA NA CHEATERÓW / DODAJ SE TU JESZCZE PLAYERID
-        gamesArray[data.gameindex].playersArray[data.pindex].al = data.letter;
-    });
-    socket.on('writeLet', function(data){
-        //UWAGA NA CHEATERÓW
-        gamesArray[data.gameindex].writeLet(data.pindex, data.x, data.y);
-    });
-    socket.on('nextTurn', function(data){
-        //UWAGA NA CHEATERÓW
-        gamesArray[data.gameindex].nextTurn(data.pindex);
-    });
-    socket.on('writeDot', function(data){
-        //UWAGA NA CHEATERÓW
-        let g = gamesArray[data.gameindex];
-
-        if(g.turn==data.pindex){
-            let x = data.x;
-            let y = data.y;
-            if(g.dotsArray.length<g.dotsMax){
-                let tileId = (y-1)*g.board+x-1;
-                let correction = (g.tilewidth/2)+(dotwidth/2)
-                let canvx = (x*g.tilewidth)-correction;
-                let canvy = (y*g.tilewidth)-correction;
-                g.dotsArray.push(new Dot(tileId, false, canvx, canvy, g.turn, dotwidth));
-                //EMIT
-                for(var i in g.playersArray){
-                    let socket = socketsList[g.playersArray[i].id];
-                    socket.emit('newDot', {
-                        end: false,
-                        x: canvx,
-                        y: canvy,
-                        c: g.playersArray[g.turn].c,
-                        w: dotwidth
-                    });
-                }
-
-                let l = g.linesArray;
-                if(g.onz==true && g.dotsArray.length==g.dotsMax-1){
-                    let id1 = g.dotsArray[g.dotsMax-4].tileId;
-                    let id2 = g.dotsArray[g.dotsMax-3].tileId;
-                    let id3 = g.dotsArray[g.dotsMax-2].tileId;
-                    //DOUBLE LINE BLOCK
-                    let lineBlock = false;
-                    for(i=0; i<l.length; i++){
-                        for(j=0; j<3; j++){
-                            if(id1==l[i][j%3] && id2==l[i][(j+1)%3] && id3==l[i][(j+2)%3]) lineBlock = true;
-                        }
-                    }
-                    if(lineBlock==false){
-                        let t1 = g.tilesArray[id1];
-                        let t2 = g.tilesArray[id2];
-                        let t3 = g.tilesArray[id3];
-                        let xdistance = t1.x-t2.x;
-                        let ydistance = t1.y-t2.y;
-                        //3 W LINII CHECK
-                        if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
-                        t2.x-xdistance==t3.x &&t2.y-ydistance==t3.y){
-                            //ONZ CHECK
-                            if(t1.l=="O" && t2.l=="N" && t3.l=="Z"){
-                                console.log("game with id: "+data.gameindex+" -> ONZ");
-                                g.linesArray.push([id1,id2,id3]);
-                                g.play("onz", 3, 1);
-                            }
-                        }
-                    }
-                } else if(g.dotsArray.length==g.dotsMax){
-                    let id1 = g.dotsArray[g.dotsMax-4].tileId;
-                    let id2 = g.dotsArray[g.dotsMax-3].tileId;
-                    let id3 = g.dotsArray[g.dotsMax-2].tileId;
-                    let id4 = g.dotsArray[g.dotsMax-1].tileId;
-                    let t1 = g.tilesArray[id1];
-                    let t2 = g.tilesArray[id2];
-                    let t3 = g.tilesArray[id3];
-                    let t4 = g.tilesArray[id4];
-                    let xdistance = t1.x-t2.x;
-                    let ydistance = t1.y-t2.y;
-                    //DLA COMBA
-                    let xdistance2 = t2.x-t3.x;
-                    let ydistance2 = t2.y-t3.y;
-                    //4 W LINII CHECK
-                    if(xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
-                    t2.x-xdistance==t3.x && t2.y-ydistance==t3.y && t3.x-xdistance==t4.x && 
-                    t3.y-ydistance==t4.y && (xdistance!=0 || ydistance !=0)){
-                        let doubleDotsBlock = 4;
-                        //DOUBLE LINE BLOCK
-                        let lineBlock = false;
-                        for(i=0; i<l.length; i++){
-                            if((id1==l[i][0] && id2==l[i][1] && id3==l[i][2] && id4==l[i][3]) ||
-                            (id1==l[i][3] && id2==l[i][2] && id3==l[i][1] && id4==l[i][0])) lineBlock = true;
-                        }
-                        if(lineBlock==false){
-                            //OZNS CHECK
-                            if(t1.l=="O" && t2.l=="Z" && t3.l=="N" && t4.l=="S"){
-                                console.log("game with id: "+data.gameindex+" -> OZNS");
-                                g.linesArray.push([id1,id2,id3,id4]);
-                                doubleDotsBlock = 0;
-                                g.endThisGame = true;
-                                let pletters = 1;
-                                if(g.turn==t1.p) pletters++;
-                                if(g.turn==t2.p) pletters++;
-                                if(g.turn==t3.p) pletters++;
-                                if(g.turn==t4.p) pletters++;
-                                g.play("ozns", 4, pletters);
-                            }
-                            //KOLOR CHECK
-                            if(g.color4==true && t1.p!==undefined && t2.p==t1.p && t3.p==t1.p && t4.p==t1.p){
-                                console.log("game with id: "+data.gameindex+" -> COLOR");
-                                g.linesArray.push([id1,id2,id3,id4]);
-                                g.play("color", doubleDotsBlock, 1);
-                            }
-                        }
-                    }//COMBO CHECK
-                    else if(g.combo==true && xdistance>=-1 && xdistance<=1 && ydistance >=-1 && ydistance<=1 &&
-                    xdistance2>=-1 && xdistance2<=1 && ydistance2 >=-1 && ydistance2<=1 &&
-                    t1.x-xdistance2==t4.x && t1.y-ydistance2==t4.y){
-                        //DOUBLE LINE BLOCK
-                        let lineBlock = false;
-                        for(i=0; i<l.length; i++){
-                            for(j=0; j<4; j++){
-                                if((id1==l[i][j%4] && id2==l[i][(j+1)%4] && id3==l[i][(j+2)%4] && id4==l[i][(j+3)%4]) ||
-                                (id1==l[i][(j+3)%4] && id2==l[i][(j+2)%4] && id3==l[i][(j+1)%4] && id4==l[i][j%4])) lineBlock = true;
-                            }
-                        }
-                        if(lineBlock==false){
-                            let cbcheck = 0;
-                            let comlet = 0;
-                            for(i=4; i>0; i--){
-                                comlet = g.tilesArray[g.dotsArray[g.dotsMax-i].tileId].l;
-                                if(comlet=="S") cbcheck = cbcheck+1;
-                                else if(comlet=="N") cbcheck = cbcheck+10;
-                                else if(comlet=="Z") cbcheck = cbcheck+100;
-                                else if(comlet=="O") cbcheck = cbcheck+1000;
-                            }
-                            if(cbcheck==1111){
-                                console.log("game with id: "+data.gameindex+" -> COMBO");
-                                g.linesArray.push([id1,id2,id3,id4]);
-                                g.move--;
-                                g.play("combo", 4, 0);
-                                for(var i in g.playersArray){
-                                    let socket = socketsList[g.playersArray[i].id];
-                                    socket.emit('combo');
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                g.dotsArray.length = g.dotsMax-4;
-                for(var i in g.playersArray){
-                    let socket = socketsList[g.playersArray[i].id];
-                    socket.emit('breakDots');
-                }
+        if(gamesArray[data.gameindex]){
+            if(gamesArray[data.gameindex]!="closed"){
+                gamesArray[data.gameindex].playersArray[data.pindex].al = data.letter;
             }
         }
     });
+    socket.on('writeLet', function(data){
+        //UWAGA NA CHEATERÓW
+        if(gamesArray[data.gameindex]){
+            if(gamesArray[data.gameindex]!="closed"){
+                gamesArray[data.gameindex].writeLet(data.pindex, data.x, data.y);
+            }
+        }
+    });
+    socket.on('nextTurn', function(data){
+        //UWAGA NA CHEATERÓW
+        if(gamesArray[data.gameindex]){
+            if(gamesArray[data.gameindex]!="closed"){
+                gamesArray[data.gameindex].nextTurn(data.pindex);
+            }
+        }
+    });
+    socket.on('writeDot', function(data){
+        //UWAGA NA CHEATERÓW
+        if(gamesArray[data.gameindex]){
+            if(gamesArray[data.gameindex]!="closed"){
+                gamesArray[data.gameindex].writeDot(data.pindex, data.gameindex, data.x, data.y);
+            }
+        }
+    });
+    socket.on('pong',function(){socket.ping=true;});
 });
