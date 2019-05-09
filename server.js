@@ -74,8 +74,8 @@ function startGame(gameindex){
     g.turn = 0;
     g.dotsMax = 4;
     g.tilewidth = canvwidth/g.board;
-    g.move;
-    g.moves;
+    g.move = 0;
+    g.moves = 0;
     //TO JUŻ JEST I TYLKO DODAJESZ KOLORY 
     //-> g.playersArray = [];
     g.tilesArray = [];
@@ -247,25 +247,20 @@ function startGame(gameindex){
         }
         g.init();
     }
-    g.init();
 }
 
 var socketsList = [];
 var io = require('socket.io')(serv);
-io.sockets.on('connect', function(socket){
+io.sockets.on('connection', function(socket){
 
-    //ŻEBY WIEDZIEĆ CZY KTOŚ WYCHODZI Z GRY
     socket.inGame = false;
-    //ŻEBY MIEĆ ZAWSZE ID
     socket.idPassed = false;
     setTimeout(function(){
         if(socket.idPassed==false) socket.emit("showMeYourId");
     },200);
 
     //CONNECTION
-    socket.emit('serverMsg',{
-        msg:'connect with server'
-    });
+    socket.emit('serverMsg',{msg:'connect with server'});
     socket.on('passId',function(data){
         socket.idPassed = true;
         socket.myid = data.pcid;
@@ -276,7 +271,6 @@ io.sockets.on('connect', function(socket){
     })
     socket.on('disconnect', (reason) => {
         let oldInGame = socket.inGame;
-        // console.log('\x1b[34m%s\x1b[0m', oldInGame);
         let found = false;
         let gameindex;
         for(i=0; (found==false && i<100); i++){
@@ -291,7 +285,6 @@ io.sockets.on('connect', function(socket){
             let g = gamesArray[gameindex];
             if(socketsList[socket.myid]){
                 nowInGame = socketsList[socket.myid].inGame;
-                // console.log('\x1b[32m%s\x1b[0m', nowInGame);
                 if(socketsList[socket.myid].idPassed==false){
                     if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
                     else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
@@ -312,7 +305,7 @@ io.sockets.on('connect', function(socket){
                     console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
                 }
             }
-        },500);
+        }, 1000);
     })
 
     //GAMES

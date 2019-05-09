@@ -67,13 +67,9 @@
             }
             if(playersLen==pn) window.location = "homepage.html";
         });
-        socket.on('startGame', function(){
-            window.location = "game.html";
-        });
+        socket.on('startGame', function(){window.location = "game.html";});
+        socket.on('closeGame', function(){window.location = "homepage.html";});
         socket.on('showMeYourId',function(){passId();});
-        socket.on('closeGame', function(){
-            window.location = "homepage.html";
-        });
     </script>
 </body>
 </html>
