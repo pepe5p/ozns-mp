@@ -271,10 +271,7 @@ io.sockets.on('connect', function(socket){
         socket.myid = data.pcid;
         if(socketsList[socket.myid]==undefined){
             socketsList[socket.myid] = socket;
-            socketsList[socket.myid].even = 1;
             console.log('\x1b[0m%s\x1b[36m%s\x1b[0m', "socket connection id: ", socket.myid);
-        } else {
-            socketsList[socket.myid].even*=-1;
         }
     })
     socket.on('disconnect', (reason) => {
@@ -282,7 +279,6 @@ io.sockets.on('connect', function(socket){
         // console.log('\x1b[34m%s\x1b[0m', oldInGame);
         let found = false;
         let gameindex;
-        let even = socketsList[socket.myid].even;
         for(i=0; (found==false && i<100); i++){
             gameindex = gamesArray.map(function(e) {
                 if(e.playersArray[i]) return e.playersArray[i].id;
@@ -296,7 +292,7 @@ io.sockets.on('connect', function(socket){
             if(socketsList[socket.myid]){
                 nowInGame = socketsList[socket.myid].inGame;
                 // console.log('\x1b[32m%s\x1b[0m', nowInGame);
-                if(socketsList[socket.myid].even==even){
+                if(socketsList[socket.myid].idPassed==false){
                     if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
                     else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
                     socketsList[socket.myid].removeAllListeners();

@@ -65,11 +65,15 @@
                 $('.pn').html(playersLen);
                 $('.players').append("<br>GRACZ "+playersLen+": "+data.newplayer);
             }
+            if(playersLen==pn) window.location = "homepage.html";
         });
         socket.on('startGame', function(){
             window.location = "game.html";
         });
         socket.on('showMeYourId',function(){passId();});
+        socket.on('closeGame', function(){
+            window.location = "homepage.html";
+        });
     </script>
 </body>
 </html>
