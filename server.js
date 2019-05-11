@@ -476,12 +476,9 @@ io.sockets.on('connect', function(socket){
                     newplayer: data.newplayer
                 });
             }
-            console.log(g.playersArray.length);
-            console.log(g.pn);
             if(g.playersArray.length==g.pn){
-                console.log("dupa");
                 for(var i in g.playersArray){
-                    console.log("dupa"+i);
+                    console.log(g.playersArray[i].id);
                     let socket = socketsList[g.playersArray[i].id];
                     socket.emit('startGame');
                 }
@@ -504,7 +501,7 @@ io.sockets.on('connect', function(socket){
     socket.on('setLet', function(data){
         //UWAGA NA CHEATERÓW / DODAJ SE TU JESZCZE PLAYERID
         if(gamesArray[data.gameindex]){
-            if(gamesArray[data.gameindex]!="closed"){
+            if(gamesArray[data.gameindex].status!="closed"){
                 gamesArray[data.gameindex].playersArray[data.pindex].al = data.letter;
             }
         }
@@ -512,7 +509,7 @@ io.sockets.on('connect', function(socket){
     socket.on('writeLet', function(data){
         //UWAGA NA CHEATERÓW
         if(gamesArray[data.gameindex]){
-            if(gamesArray[data.gameindex]!="closed"){
+            if(gamesArray[data.gameindex].status!="closed"){
                 gamesArray[data.gameindex].writeLet(data.pindex, data.x, data.y);
             }
         }
@@ -520,7 +517,7 @@ io.sockets.on('connect', function(socket){
     socket.on('nextTurn', function(data){
         //UWAGA NA CHEATERÓW
         if(gamesArray[data.gameindex]){
-            if(gamesArray[data.gameindex]!="closed"){
+            if(gamesArray[data.gameindex].status!="closed"){
                 gamesArray[data.gameindex].nextTurn(data.pindex);
             }
         }
@@ -528,7 +525,7 @@ io.sockets.on('connect', function(socket){
     socket.on('writeDot', function(data){
         //UWAGA NA CHEATERÓW
         if(gamesArray[data.gameindex]){
-            if(gamesArray[data.gameindex]!="closed"){
+            if(gamesArray[data.gameindex].status!="closed"){
                 gamesArray[data.gameindex].writeDot(data.pindex, data.gameindex, data.x, data.y);
             }
         }
