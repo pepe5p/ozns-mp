@@ -111,9 +111,7 @@ $(function() {
         g.dotsMax = 4;
         $("#board > .flexbox").children(".tile").empty();
     });
-    socket.on('closeGame', function(){
-        window.location = "homepage.html";
-    });
+    socket.on('closeGame', function(){window.location = "homepage.html";});
 
     //FUNCTIONS
     function showcanv(){

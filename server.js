@@ -476,8 +476,12 @@ io.sockets.on('connect', function(socket){
                     newplayer: data.newplayer
                 });
             }
+            console.log(g.playersArray.length);
+            console.log(g.pn);
             if(g.playersArray.length==g.pn){
+                console.log("dupa");
                 for(var i in g.playersArray){
+                    console.log("dupa"+i);
                     let socket = socketsList[g.playersArray[i].id];
                     socket.emit('startGame');
                 }
