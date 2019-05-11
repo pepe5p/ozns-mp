@@ -392,7 +392,7 @@ function startGame(gameindex){
 var socketsList = [];
 var io = require('socket.io')(serv);
 io.sockets.on('connect', function(socket){
-
+    
     socket.ping = false;
     socket.inGame = false;
     socket.idPassed = false;
@@ -402,7 +402,7 @@ io.sockets.on('connect', function(socket){
 
     //CONNECTION
     socket.emit('serverMsg',{msg:'connect with server'});
-    socket.on('passId',function(data){
+    socket.on('passId', function(data){
         socket.idPassed = true;
         socket.myid = data.pcid;
         if(socketsList[socket.myid]==undefined){
@@ -424,19 +424,18 @@ io.sockets.on('connect', function(socket){
         setTimeout(()=>{
             let nowInGame;
             let g = gamesArray[gameindex];
-            if(socketsList[socket.myid]){
-                nowInGame = socketsList[socket.myid].inGame;
-                socketsList[socket.myid].emit("ping");
-                setTimeout(()=>{
-                    console.log(socketsList[socket.myid].ping);
-                    if(socketsList[socket.myid].ping==true){
+            // socketsList[socket.myid].emit('sendPing');
+            nowInGame = socketsList[socket.myid].inGame;
+            // setTimeout(()=>{
+                if(socketsList[socket.myid]){
+                    if(socketsList[socket.myid].ping==false){
                         if(reason=="transport close") console.log('\x1b[0m%s\x1b[35m%s\x1b[0m', "socket disconnect id: ", socket.myid);
                         else console.log('\x1b[0m%s\x1b[31m%s\x1b[0m%s\x1b[31m%s\x1b[0m', "socket disconnect id: ", socket.myid, " ,because ", reason);
-                        socketsList[socket.myid].removeAllListeners();
-                        delete socketsList[socket.myid];
+                        // socketsList[socket.myid].removeAllListeners();
+                        // delete socketsList[socket.myid];
                     }
-                },500);
-            } else nowInGame==false;
+                } else nowInGame==false;
+            // }, 1000);
             if(g){
                 if(oldInGame==true && nowInGame==false){
                     for(var i in g.playersArray){
@@ -450,7 +449,7 @@ io.sockets.on('connect', function(socket){
                     console.log('\x1b[0m%s%s\x1b[31m%s\x1b[0m', "game with index: ", gameindex, " was aborted");
                 }
             }
-        },500);
+        },1000);
     })
 
     //GAMES
@@ -530,5 +529,8 @@ io.sockets.on('connect', function(socket){
             }
         }
     });
-    socket.on('pong',function(){socket.ping=true;});
+    // socket.on('sendPong', function(){
+    //     console.log("pong");
+    //     socketsList[socket.myid].ping = true;
+    // });
 });

@@ -153,8 +153,6 @@
             document.cookie = "gameindex="+data.gameindex;
             setTimeout(function(){window.location = "queue.html"},100)
         })
-        socket.on('showMeYourId',function(){passId();});
-        socket.on('ping',function(){socket.emit('pong');});
     </script>
 </body>
 </html>

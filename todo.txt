@@ -3,12 +3,12 @@ I MUST HAVE
 C. poczeklania, rozpoczynanie gry
 C. stawianie liter
 C. skreślanie
-C. wychodzenie z poczeklani i gry musi kończyć gre i wyrzucać wszystkich do głównej :1-2h
+. wychodzenie z poczeklani i gry musi kończyć gre i wyrzucać wszystkich do głównej :1-2h
 . zabezpieczenie przed wysypywaniem serwera np if(var) jeśli może nie istnieć :30min
 . zabezpieczenie przed cheaterami :30min
 . socket.io przy findgames
 N. szerokość planszy :2h
-C. ogarnięcie socket.io i naprawa zdupconego kodu połączeń którego nie ogarniasz :1-8h
+. ogarnięcie socket.io i naprawa zdupconego kodu połączeń którego nie ogarniasz :1-8h
 
 II POTRZEBNE
 . karty 4-6h

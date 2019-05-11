@@ -1,7 +1,15 @@
+
 var socket = io();
+
 socket.on('serverMsg', function(data){
     console.log(data.msg);
 });
+socket.on('showMeYourId', function(){passId();});
+// socket.on('sendPing', function(){
+//     console.log("ping");
+//     socket.emit('sendPong');
+// });
+
 var pcid = getCookie("pcid");
 if (pcid == null) {
     document.cookie = "pcid="+Math.random();
@@ -10,7 +18,7 @@ if (pcid == null) {
 function passId(){
     socket.emit('passId',{
         pcid: pcid
-    })
+    });
 }
 function getCookie(cname) {
     var name = cname + "=";

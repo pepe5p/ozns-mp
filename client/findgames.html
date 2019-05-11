@@ -76,8 +76,6 @@
         socket.on('closeGame', function(){
             window.location = "homepage.html";
         });
-        socket.on('showMeYourId',function(){passId();});
-        socket.on('ping',function(){socket.emit('pong');});
 
         var gbox = $('.makegrey');
         var pnick = $('.put_nick');
